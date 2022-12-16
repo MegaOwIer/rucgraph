@@ -1,6 +1,6 @@
 # rucgraph
 
-This is a collection of cpp header files mainly used for graph computing tasks
+This is a library of cpp header files mainly used for graph computing tasks
 
 
 
