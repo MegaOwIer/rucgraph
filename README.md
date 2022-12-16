@@ -1,5 +1,4 @@
-# rucgraph
-This is a collection of cpp header files for graph mining researches.
+# rucgraph: a collection of cpp header files for graph mining researches.
 
 # Note for upating h files.
 
