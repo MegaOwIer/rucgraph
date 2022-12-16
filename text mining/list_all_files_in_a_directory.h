@@ -1,12 +1,11 @@
 #pragma once
 
 
-/* remember to use C++17 for #include <filesystem>
+/* remember to use C++17 (not C17) for #include <filesystem>
 https://stackoverflow.com/questions/50668814/vs2017-e0135-namespace-std-has-no-member-filesystem
 
 https://stackoverflow.com/questions/53612757/where-to-define-silence-cxx17-allocator-void-deprecation-warning-or-silence-al
 */
-
 #include <string>
 #include <iostream>
 #include <filesystem>

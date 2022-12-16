@@ -11,7 +11,7 @@
 void ysgraph_statistics() {
 
     queue<string> unchecked_directories;
-    unchecked_directories.push("C:/Users/Yahui/Google Drive/ysgraph"); // path of ysgraph
+    unchecked_directories.push("C:/Users/Yahui/Drive/rucgraph"); // path of ysgraph
 
     /*get all_header_files_paths inside the above path*/
     vector<string> all_header_files_paths;
@@ -71,3 +71,20 @@ void ysgraph_statistics() {
     cout << "per_header_file_avg_non_empty_lines: " << per_header_file_avg_non_empty_lines << endl;
     cout << "per_header_file_avg_string_length: " << per_header_file_avg_string_length << endl;
 }
+
+
+
+/*
+Example main file:
+------------------------------------------
+
+using namespace std;
+
+#include <text mining/ysgraph_statistics.h>
+
+int main()
+{
+    ysgraph_statistics();
+}
+------------------------------------------------
+*/
