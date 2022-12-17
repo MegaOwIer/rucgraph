@@ -1,5 +1,5 @@
 #pragma once
-#include <text mining/parse_string.h> 
+#include <text_mining/parse_string.h> 
 #include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 #include <string>
 #include <vector>

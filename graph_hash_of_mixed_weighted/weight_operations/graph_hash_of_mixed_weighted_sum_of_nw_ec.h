@@ -1,5 +1,5 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 double graph_hash_of_mixed_weighted_sum_of_nw_ec(graph_hash_of_mixed_weighted& input_graph) {
 
@@ -37,8 +37,6 @@ double graph_hash_of_mixed_weighted_sum_of_nw_ec(graph_hash_of_mixed_weighted& i
 }
 
 
-
-
 double graph_hash_of_mixed_weighted_sum_of_nw(graph_hash_of_mixed_weighted& input_graph) {
 
 	double sum = 0;
@@ -52,7 +50,6 @@ double graph_hash_of_mixed_weighted_sum_of_nw(graph_hash_of_mixed_weighted& inpu
 	return sum;
 
 }
-
 
 
 double graph_hash_of_mixed_weighted_sum_of_ec(graph_hash_of_mixed_weighted& input_graph) {

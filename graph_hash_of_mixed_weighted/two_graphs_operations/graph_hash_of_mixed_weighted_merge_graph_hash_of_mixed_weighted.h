@@ -1,4 +1,5 @@
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_merge_graph_hash_of_mixed_weighted(graph_hash_of_mixed_weighted& g1, graph_hash_of_mixed_weighted& g2) {
 

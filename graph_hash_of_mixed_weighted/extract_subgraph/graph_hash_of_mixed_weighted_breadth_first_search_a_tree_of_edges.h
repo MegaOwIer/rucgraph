@@ -1,6 +1,8 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 #include <queue>
+#include <unordered_map>
+
 std::vector<std::pair<int, int>> 
 graph_hash_of_mixed_weighted_breadth_first_search_a_tree_of_edges(graph_hash_of_mixed_weighted& input_graph, int& root) {
 
@@ -10,7 +12,7 @@ graph_hash_of_mixed_weighted_breadth_first_search_a_tree_of_edges(graph_hash_of_
 
 	std::vector<std::pair<int, int>> discovered_edges;
 
-	unordered_map<int, bool> discovered;
+	std::unordered_map<int, bool> discovered;
 	for (auto it = input_graph.hash_of_vectors.begin(); it != input_graph.hash_of_vectors.end(); it++) {
 		int v = it->first;
 		if (v == root) {

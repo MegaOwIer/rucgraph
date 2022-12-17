@@ -1,6 +1,7 @@
 #pragma once
-
 #include <queue>
+#include <vector>
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 std::list<std::list<int>> graph_hash_of_mixed_weighted_connected_components(graph_hash_of_mixed_weighted& input_graph) {
 
@@ -77,23 +78,23 @@ std::list<std::list<int>> graph_hash_of_mixed_weighted_connected_components(grap
 //cout << "max_cpn_size: " << max_cpn_size << endl;
 
 
-vector<vector<int>> graph_hash_of_mixed_weighted_connected_components_vector_format(graph_hash_of_mixed_weighted& input_graph, int max_V_id) {
+std::vector<std::vector<int>> graph_hash_of_mixed_weighted_connected_components_vector_format(graph_hash_of_mixed_weighted& input_graph, int max_V_id) {
 
 	/*this is to find connected_components using depth first search; time complexity O(|V|+|E|);
 	related content: https://www.boost.org/doc/libs/1_68_0/boost/graph/connected_components.hpp
 	https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm*/
 
-	vector<vector<int>> components;
+	std::vector<std::vector<int>> components;
 
 	/*time complexity: O(V)*/
-	vector<bool> discovered((int)(max_V_id + (int)1), false);
+	std::vector<bool> discovered((int)(max_V_id + (int)1), false);
 
 	for (auto it = input_graph.hash_of_vectors.begin(); it != input_graph.hash_of_vectors.end(); it++) {
 		int i = it->first;
 
 		if (discovered[i] == false) { // if memory overflow here, then the input max_V_id is too small
 
-			vector<int> component;
+			std::vector<int> component;
 
 			/*below is a breadth first search; time complexity O(|V|+|E|)*/
 			std::queue<int> Q; // Queue is a data structure designed to operate in FIFO (First in First out) context.

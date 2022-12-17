@@ -1,10 +1,8 @@
 
 #pragma once
-
-
-
 #include <unordered_map>
 #include <boost/heap/fibonacci_heap.hpp> 
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 /*in a DBLP graph with 150k vertices and 500k edges,
 the below code based on pairing_heap uses 0.72s;

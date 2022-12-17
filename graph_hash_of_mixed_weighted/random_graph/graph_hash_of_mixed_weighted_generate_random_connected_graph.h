@@ -1,5 +1,5 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 #include <boost/random.hpp>
 graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_generate_random_connected_graph(double V, double E, double nw_min, double nw_max,
@@ -31,8 +31,8 @@ graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_generate_random_connec
 		}
 	}
 	else if (E > V* (V - 1) / 2) {
-		cout << E << endl;
-		cout << V * (V - 1) / 2 << endl;
+		std::cout << E << std::endl;
+		std::cout << V * (V - 1) / 2 << std::endl;
 		std::cout << "E > V * (V - 1) / 2 in graph_unordered_map_generate_random_connected_graph!" << '\n';
 		exit(1);
 	}

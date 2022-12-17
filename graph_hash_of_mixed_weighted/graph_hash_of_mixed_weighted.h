@@ -859,7 +859,17 @@ void graph_hash_of_mixed_weighted_print_size(graph_hash_of_mixed_weighted& input
 
 
 
-/*the following are test codes*/
+/*the following are test codes
+
+------------------
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
+
+int main()
+{
+	graph_hash_of_mixed_weighted_example();
+}
+---------------------------
+*/
 
 
 void test_graph_hash_of_mixed_weighted() {

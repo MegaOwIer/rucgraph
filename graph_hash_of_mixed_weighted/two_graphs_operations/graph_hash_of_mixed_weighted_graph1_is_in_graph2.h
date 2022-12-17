@@ -1,4 +1,5 @@
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 bool graph_hash_of_mixed_weighted_graph1_is_in_graph2(graph_hash_of_mixed_weighted& graph1, graph_hash_of_mixed_weighted& graph2) {
 

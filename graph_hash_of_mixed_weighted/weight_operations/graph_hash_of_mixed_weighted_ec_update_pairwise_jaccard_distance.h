@@ -1,5 +1,5 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 void graph_hash_of_mixed_weighted_ec_update_pairwise_jaccard_distance(graph_hash_of_mixed_weighted& input_graph) {
 
@@ -88,7 +88,7 @@ void graph_hash_of_mixed_weighted_ec_update_pairwise_jaccard_distance_fast(graph
 	since this function uses merge-join to fast compute V_i_cap_V_j */
 
 
-	vector<vector<pair<int, double>>> adj_lists(max_N + 1); // sorted lists
+	std::vector<std::vector<std::pair<int, double>>> adj_lists(max_N + 1); // sorted lists
 	for (auto it1 = input_graph.hash_of_vectors.begin(); it1 != input_graph.hash_of_vectors.end(); it1++) {
 		adj_lists[it1->first] = input_graph.adj_v_and_ec(it1->first);
 	}
@@ -130,11 +130,30 @@ void graph_hash_of_mixed_weighted_ec_update_pairwise_jaccard_distance_fast(graph
 }
 
 
+
+
+
+
+
+
+
+/*
+------------------
+#include <graph_hash_of_mixed_weighted/weight_operations/graph_hash_of_mixed_weighted_ec_update_pairwise_jaccard_distance.h>
+
+int main()
+{
+	test_pairwise_jaccard_distance();
+}
+---------------------
+*/
+
+
 #pragma region
 
 #include<chrono>
-#include<graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_generate_random_connected_graph.h>
-#include<graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_graph1_is_graph2.h>
+#include<graph_hash_of_mixed_weighted/random_graph/graph_hash_of_mixed_weighted_generate_random_connected_graph.h>
+#include<graph_hash_of_mixed_weighted/two_graphs_operations/graph_hash_of_mixed_weighted_graph1_is_graph2.h>
 
 void test_pairwise_jaccard_distance() {
 
@@ -172,15 +191,15 @@ void test_pairwise_jaccard_distance() {
 		}
 
 		if (graph_hash_of_mixed_weighted_graph1_is_graph2(graph1, graph2) == false) {
-			cout << "graph_hash_of_mixed_weighted_graph1_is_in_graph2(graph1, graph2) == false!" << endl;
+			std::cout << "graph_hash_of_mixed_weighted_graph1_is_in_graph2(graph1, graph2) == false!" << std::endl;
 			exit(1);
 		}
 
 
 	}
 
-	cout << "time_old = " << time_old << "s" << endl;
-	cout << "time_new = " << time_new << "s" << endl;
+	std::cout << "time_old = " << time_old << "s" << std::endl;
+	std::cout << "time_new = " << time_new << "s" << std::endl;
 }
 #pragma endregion test_pairwise_jaccard_distance
 

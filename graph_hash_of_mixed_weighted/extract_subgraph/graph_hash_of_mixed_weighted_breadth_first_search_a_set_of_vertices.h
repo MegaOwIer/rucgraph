@@ -1,15 +1,17 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
 #include <queue>
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 /* this function uses breadth_first_search to find all vertices that connect to root, 
 including root; time complexity: O(V + E) */
 
-unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_set_of_vertices(graph_hash_of_mixed_weighted& input_graph, int root) {
+std::unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_set_of_vertices(graph_hash_of_mixed_weighted& input_graph, int root) {
 
-	unordered_set<int> root_component; // v is connected to root; including root
+	std::unordered_set<int> root_component; // v is connected to root; including root
 
-	unordered_map<int, bool> unprocessed;	
+	std::unordered_map<int, bool> unprocessed;
 	for (auto it = input_graph.hash_of_vectors.begin(); it != input_graph.hash_of_vectors.end(); it++) {
 		if (it->first == root) {
 			unprocessed[it->first] = false; // mark root as discovered

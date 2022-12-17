@@ -1,5 +1,5 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 void graph_hash_of_mixed_weighted_copy_weights_of_graph1_to_graph2
 (graph_hash_of_mixed_weighted& graph1, graph_hash_of_mixed_weighted& graph2) {

@@ -1,7 +1,8 @@
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
+
 
 /* T can be vector<int>, or list<int>, or unordered_set<int>*/
-
 template <typename T>
 graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_extract_subgraph(graph_hash_of_mixed_weighted& input_graph, T& list_of_v) {
 

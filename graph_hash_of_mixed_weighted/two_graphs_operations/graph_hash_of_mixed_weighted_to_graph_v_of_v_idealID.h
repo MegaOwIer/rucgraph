@@ -1,8 +1,8 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 #include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 
-graph_v_of_v_idealID graph_hash_of_mixed_weighted_to_graph_v_of_v_idealID(graph_hash_of_mixed_weighted& input_graph, unordered_map<int, int>& vertexID_old_to_new) {
+graph_v_of_v_idealID graph_hash_of_mixed_weighted_to_graph_v_of_v_idealID(graph_hash_of_mixed_weighted& input_graph, std::unordered_map<int, int>& vertexID_old_to_new) {
 
 	graph_v_of_v_idealID output_graph(input_graph.hash_of_vectors.size());
 

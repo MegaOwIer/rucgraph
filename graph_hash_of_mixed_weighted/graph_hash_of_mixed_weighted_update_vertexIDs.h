@@ -1,4 +1,5 @@
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 template<typename T> // T can be std::unordered_map<int, int>, or vector<int>
 graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_update_vertexIDs(graph_hash_of_mixed_weighted& input_graph, T& vertex_IDs_input_to_out_put) {

@@ -1,12 +1,15 @@
 #pragma once
-
+#include <unordered_set>
+#include <unordered_map>
+#include <queue>
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 std::unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_depth_of_vertices_from_one_root(graph_hash_of_mixed_weighted& input_graph, int root, int depth) {
 
 	/*the depth of root is 0, only search depth_v <= depth*/
 
-	unordered_set<int> dfs_searched_nearby;
-	unordered_map<int, int> touched_vertices_depths; // V_ID, depth
+	std::unordered_set<int> dfs_searched_nearby;
+	std::unordered_map<int, int> touched_vertices_depths; // V_ID, depth
 	std::queue<int> Q_touched_not_searched_nearby;
 
 	Q_touched_not_searched_nearby.push(root);
@@ -53,7 +56,7 @@ std::unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixe
 
 	/*the depth of root is 0, only search depth_v <= depth*/
 
-	unordered_set<int> results;
+	std::unordered_set<int> results;
 
 	for (auto it = roots.begin(); it != roots.end(); it++) {
 		int root = *it;

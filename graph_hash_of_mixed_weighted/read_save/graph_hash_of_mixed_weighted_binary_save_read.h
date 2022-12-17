@@ -1,5 +1,5 @@
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 #include <text_mining/binary_save_read_vector_of_vectors.h>
 
 /*
@@ -7,15 +7,15 @@ save graph as vector<vector<pair<int, double>>>; each vector is ..... <v,w_v>, <
 (in the last pair, 0 means that the adj list of v is in vectors in graph, whle 1 means that ~ is in hashs in graph)
 */
 
-void graph_hash_of_mixed_weighted_binary_save(graph_hash_of_mixed_weighted& save_graph, string save_path) {
+void graph_hash_of_mixed_weighted_binary_save(graph_hash_of_mixed_weighted& save_graph, std::string save_path) {
 
-	vector<vector<pair<int, double>>> save_vectors;
+	std::vector<std::vector<std::pair<int, double>>> save_vectors;
 
 	for (auto it = save_graph.hash_of_vectors.begin(); it != save_graph.hash_of_vectors.end(); it++) {
 		int v = it->first;
 		double w_v = it->second.vertex_weight;
 
-		vector<pair<int, double>> save_vector;
+		std::vector<std::pair<int, double>> save_vector;
 
 		auto search = save_graph.hash_of_hashs.find(v);
 		if (search != save_graph.hash_of_hashs.end()) {
@@ -41,9 +41,9 @@ void graph_hash_of_mixed_weighted_binary_save(graph_hash_of_mixed_weighted& save
 
 
 
-graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_binary_read(string save_path) {
+graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_binary_read(std::string save_path) {
 
-	vector<vector<pair<int, double>>> save_vectors;
+	std::vector<std::vector<std::pair<int, double>>> save_vectors;
 	binary_read_vector_of_vectors(save_path, save_vectors);
 
 	graph_hash_of_mixed_weighted save_graph;
@@ -56,13 +56,13 @@ graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_binary_read(string sav
 
 		if ((*it)[vector_size - 1].first == 0) {
 			if (vector_size > 2) {
-				vector<pair<int, double>> adj_list((*it).begin(), (*it).begin() + vector_size - 2); // https://www.techiedelight.com/get-slice-sub-vector-from-vector-cpp/
+				std::vector<std::pair<int, double>> adj_list((*it).begin(), (*it).begin() + vector_size - 2); // https://www.techiedelight.com/get-slice-sub-vector-from-vector-cpp/
 				save_graph.hash_of_vectors[(*it)[vector_size - 2].first].adj_vertices = adj_list;
 			}
 		}
 		else {
 			std::unordered_map<int, double> adj_list_hash;
-			vector<pair<int, double>> adj_list((*it).begin(), (*it).begin() + vector_size - 2); // https://www.techiedelight.com/get-slice-sub-vector-from-vector-cpp/
+			std::vector<std::pair<int, double>> adj_list((*it).begin(), (*it).begin() + vector_size - 2); // https://www.techiedelight.com/get-slice-sub-vector-from-vector-cpp/
 			for (auto it2 = adj_list.begin(); it2 != adj_list.end(); it2++) {
 				adj_list_hash[it2->first] = it2->second;
 			}

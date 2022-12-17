@@ -1,4 +1,5 @@
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 bool graph_hash_of_mixed_weighted_graph1_is_graph2(graph_hash_of_mixed_weighted& graph1, graph_hash_of_mixed_weighted& graph2) {
 
@@ -18,8 +19,8 @@ bool graph_hash_of_mixed_weighted_graph1_is_graph2(graph_hash_of_mixed_weighted&
 			}
 		}
 
-		vector<pair<int, double>> v_adj_list_graph1 = graph1.adj_v_and_ec(v);
-		vector<pair<int, double>> v_adj_list_graph2 = graph2.adj_v_and_ec(v);
+		std::vector<std::pair<int, double>> v_adj_list_graph1 = graph1.adj_v_and_ec(v);
+		std::vector<std::pair<int, double>> v_adj_list_graph2 = graph2.adj_v_and_ec(v);
 
 		if (v_adj_list_graph1.size() != v_adj_list_graph2.size()) { // adj lists of v are different
 			return false;

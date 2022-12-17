@@ -14,7 +14,7 @@ using namespace std;
 #include <boost/random.hpp>
 boost::random::mt19937 boost_random_time_seed{ static_cast<std::uint32_t>(std::time(0)) };
 
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/test_PLL_PSL_v1.h>
+#include <build_in_progress/HL/two_hop_v1/test_PLL_PSL_v1.h>
 
 
 int main()
@@ -25,7 +25,7 @@ int main()
 ------------------------------------------------------------------------------------------
 Commends for running the above cpp file on Linux:
 
-g++ -std=c++17 -I/home/boost_1_75_0 -I/root/ysgraph try.cpp -lpthread -Ofast -o A
+g++ -std=c++17 -I/home/boost_1_75_0 -I/root/rucgraph try.cpp -lpthread -Ofast -o A
 ./A
 rm A
 
@@ -33,12 +33,12 @@ rm A
 
 
 */
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_PLL_v1.h>
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_PSL_v1.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_generate_random_graph.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_read_graph_with_weight.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_save_graph_with_weight.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_shortest_paths.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_PLL_v1.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_PSL_v1.h>
+#include <graph_hash_of_mixed_weighted/random_graph/graph_hash_of_mixed_weighted_generate_random_graph.h>
+#include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_read_graph_with_weight.h>
+#include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_save_graph_with_weight.h>
+#include <graph_hash_of_mixed_weighted/common_algorithms/graph_hash_of_mixed_weighted_shortest_paths.h>
 
 void graph_hash_of_mixed_weighted_PLL_PSL_v1_check_correctness(graph_hash_of_mixed_weighted_two_hop_case_info_v1& case_info,
 	graph_hash_of_mixed_weighted& instance_graph, int iteration_source_times, int iteration_terminal_times) {

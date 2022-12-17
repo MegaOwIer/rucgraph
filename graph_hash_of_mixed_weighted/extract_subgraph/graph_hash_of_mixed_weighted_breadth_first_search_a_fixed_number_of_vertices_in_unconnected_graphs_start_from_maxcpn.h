@@ -7,29 +7,30 @@ note that,if one root is not enough to span a fixed number of vertices, then mul
 
 if target_V > |V| of input_graph, then it returns all vertices in input_graph*/
 
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices.h>
+#include <graph_hash_of_mixed_weighted/extract_subgraph/graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices.h>
 
+#include <random>
 #include <iostream>     // std::cout
 #include <algorithm>    // std::random_shuffle
 #include <vector>       // std::vector
 #include <ctime>        // std::time
 #include <cstdlib>      // std::rand, std::srand
 #include <boost/random.hpp>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_connected_components.h>
+#include <graph_hash_of_mixed_weighted/common_algorithms/graph_hash_of_mixed_weighted_connected_components.h>
 
 
 
-bool compare_graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices_in_unconnected_graphs_start_from_maxcpn(const pair<std::list<int>, int>& i, pair<std::list<int>, int>& j)
+bool compare_graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices_in_unconnected_graphs_start_from_maxcpn(const std::pair<std::list<int>, int>& i, std::pair<std::list<int>, int>& j)
 {
 	return i.second > j.second;  // < is from small to big; > is from big to small.  sort by the second item of pair<int, int>
 }
 
 
 
-unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices_in_unconnected_graphs_start_from_maxcpn
+std::unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices_in_unconnected_graphs_start_from_maxcpn
 (graph_hash_of_mixed_weighted& input_graph, int target_V) {
 
-	unordered_set<int> unselected_vertices;
+	std::unordered_set<int> unselected_vertices;
 	for (auto it = input_graph.hash_of_vectors.begin(); it != input_graph.hash_of_vectors.end(); ++it) {
 		int v = it->first;
 		unselected_vertices.insert(v);
@@ -39,7 +40,7 @@ unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_num
 
 	std::list<std::list<int>> old_cpn = graph_hash_of_mixed_weighted_connected_components(input_graph);
 
-	vector<pair<std::list<int>, int>> sorted_vector;
+	std::vector<std::pair<std::list<int>, int>> sorted_vector;
 	for (auto it = old_cpn.begin(); it != old_cpn.end(); it++) {
 		sorted_vector.push_back({ *it , (*it).size() }); // sort cpn by sizes, from large to small
 	}
@@ -49,7 +50,7 @@ unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_num
 		cpn.push_back(sorted_vector[i].first);
 	}
 
-	unordered_set<int> selected_vertices;
+	std::unordered_set<int> selected_vertices;
 	while (selected_vertices.size() < target_V && unselected_vertices.size() > 0) {
 
 		int lack_num = target_V - selected_vertices.size();
@@ -72,7 +73,7 @@ unordered_set<int> graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_num
 				}
 			}
 
-			unordered_set<int> hashV = graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices(input_graph, lack_num, root);
+			std::unordered_set<int> hashV = graph_hash_of_mixed_weighted_breadth_first_search_a_fixed_number_of_vertices(input_graph, lack_num, root);
 
 			for (auto it = hashV.begin(); it != hashV.end(); it++) {
 				int v = *it;

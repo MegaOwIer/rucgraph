@@ -1,8 +1,8 @@
-
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
-void graph_hash_of_mixed_weighted_copy_graph_to_another_graph
-(graph_hash_of_mixed_weighted& target_graph, graph_hash_of_mixed_weighted& copied_graph) {
+
+void graph_hash_of_mixed_weighted_copy_graph_to_another_graph(graph_hash_of_mixed_weighted& target_graph, graph_hash_of_mixed_weighted& copied_graph) {
 
 	/*time complexity: O(|V_copied_graph| +|E_copied_graph|);
 	this is to merge copied_graph into target_graph*/

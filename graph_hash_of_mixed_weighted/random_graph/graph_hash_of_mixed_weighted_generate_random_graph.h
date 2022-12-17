@@ -1,6 +1,5 @@
-
 #pragma once
-
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 /*this function generates a random graph with vertex and edge weights, and this graph
 may not be connected.*/
@@ -98,52 +97,3 @@ graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_generate_random_graph(
 
 
 
-
-/*
-Example:
-
-#include <iostream>
-#include <fstream>
-using namespace std;
-
-#include <boost/random.hpp>
-boost::random::mt19937 boost_random_time_seed{ static_cast<std::uint32_t>(std::time(0)) };
-
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_generate_random_graph.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_read_graph_with_weight.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_save_graph_with_weight.h>
-
-
-
-void Example_graph_hash_of_mixed_weighted_generate_random_graph() {
-
-	int iteration_times = 100;
-	int V = 100, E = 500, precision = 1;
-	double ec_min = 1, ec_max = 10, nw_min = 1, nw_max = 10;
-
-	for (int i = 0; i < iteration_times; i++) {
-
-		double alpha = (double)(rand() % 11) / 10; // alpha is just a saved and read value, often useless
-
-		int generate_new_graph = 1;
-		graph_hash_of_mixed_weighted instance_graph, query_state_graph;
-		if (generate_new_graph == 1) {
-			instance_graph = graph_hash_of_mixed_weighted_generate_random_graph(V, E, nw_min, nw_max, ec_min, ec_max, precision, boost_random_time_seed);
-			graph_hash_of_mixed_weighted_save_graph_with_weight("instance_graph.txt", instance_graph, alpha);
-		}
-		else {
-			graph_hash_of_mixed_weighted_read_graph_with_weight("instance_graph.txt", instance_graph, alpha);
-		}
-
-	}
-
-}
-
-
-int main()
-{
-	Example_graph_hash_of_mixed_weighted_generate_random_graph();
-}
-
-*/

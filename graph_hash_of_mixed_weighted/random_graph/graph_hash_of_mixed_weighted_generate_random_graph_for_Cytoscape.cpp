@@ -8,7 +8,7 @@ using namespace std;
 boost::random::mt19937 boost_random_time_seed{ static_cast<std::uint32_t>(std::time(0)) };
 
 #include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_generate_random_graph.h>
+#include <graph_hash_of_mixed_weighted/random_graph/graph_hash_of_mixed_weighted_generate_random_graph.h>
 
 void test() {
 

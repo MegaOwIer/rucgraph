@@ -1,4 +1,5 @@
 #pragma once
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 void graph_hash_of_mixed_weighted_nw_ec_normalization_with_range(graph_hash_of_mixed_weighted& input_graph, double range_left, double range_right) {
 

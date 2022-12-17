@@ -1,8 +1,7 @@
 #pragma once
-
-
 #include <unordered_map>
 #include <boost/heap/pairing_heap.hpp> 
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
 /*pairing_heap is 1/6 fatser than fibonacci_heap*/
 

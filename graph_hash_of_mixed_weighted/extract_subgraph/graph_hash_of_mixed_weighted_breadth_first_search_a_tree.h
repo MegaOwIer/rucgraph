@@ -1,6 +1,6 @@
 #pragma once
 
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_breadth_first_search_a_tree_of_edges.h>
+#include <graph_hash_of_mixed_weighted/extract_subgraph/graph_hash_of_mixed_weighted_breadth_first_search_a_tree_of_edges.h>
 
 graph_hash_of_mixed_weighted graph_hash_of_mixed_weighted_breadth_first_search_a_tree(graph_hash_of_mixed_weighted& input_graph, int& root) {
 
