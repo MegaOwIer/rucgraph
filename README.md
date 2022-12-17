@@ -2,7 +2,7 @@
 
 This is a library of cpp header files mainly used for graph computing tasks.
 
-Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph.
+Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph. Some other descriptions can also be found on this [page](https://yahuisun.github.io/rucgraph/).
 
 <br/>
 
