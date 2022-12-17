@@ -10,7 +10,8 @@ Here is [a Table of Contents of rucgraph](assets/Introduction.pdf).
 
 ## How to use rucgraph
 
-You can just download the whole repository into a rucgraph folder, and add the path of this folder when compiling cpp codes.
+You can download the whole repository into a rucgraph folder, and add the path of this folder when compiling cpp codes.
+
 
 ### An example of using rucgraph on a Linux server
 
@@ -33,7 +34,27 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ./a.out
 ```
 , where "-I/root/rucgraph" is to add the path of the rucgraph folder when compiling. Then, you successfully run an example application of an augmented pairing heap, detailed in "PairingHeapYS_with_offset.h".
-![MarineGEO circle logo](/assets/images/202212171254231.png "MarineGEO logo")
+![](/assets/images/202212171254231.png)
+
+
+### An example of using both boost and rucgraph on a Linux server
+
+Some header files in rucgraph require [the Boost library](https://www.boost.org/). To use these files, it is required to download the Boost library as well. For example, Given a cpp file named as "try.cpp", the contents in which are
+```
+#include <graph_v_of_v_idealID/common_algorithms/graph_v_of_v_idealID_shortest_paths.h>
+
+int main()
+{
+	test_graph_v_of_v_idealID_shortest_paths();
+}
+```
+In the terminal, compile and run the above codes using the following commands:
+```
+g++ -std=c++17 -I/home/boost_1_75_0 -I/root/rucgraph try.cpp -o a.out
+./a.out
+```
+, where "-I/home/boost_1_75_0" is to add the path of the boost folder when compiling. Then, you successfully run a test of finding shortest paths in a graph, detailed in "graph_v_of_v_idealID_shortest_paths.h".
+![](/assets/images/20221217183837.png)
 
 <br/>
 

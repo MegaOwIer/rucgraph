@@ -1,6 +1,7 @@
 #pragma once
+#include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 
-graph_v_of_v_idealID graph_v_of_v_idealID_change_new_vertexIDs(graph_v_of_v_idealID& input_graph, vector<int>& vertexID_old_to_new) {
+graph_v_of_v_idealID graph_v_of_v_idealID_change_new_vertexIDs(graph_v_of_v_idealID& input_graph, std::vector<int>& vertexID_old_to_new) {
 
 	int N = input_graph.size();
 

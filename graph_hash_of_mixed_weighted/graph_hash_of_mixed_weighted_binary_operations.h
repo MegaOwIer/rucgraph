@@ -2,7 +2,7 @@
 
 
 /*
-for a sorted vector<pair<int,double>>, this dunction conducted binary (divide and conquer) operations on this vector;
+for a sorted vector<pair<int,T>>, this dunction conducted binary (divide and conquer) operations on this vector;
 
 the int values are unique and sorted from small to large
 
@@ -11,7 +11,7 @@ https://blog.csdn.net/EbowTang/article/details/50770315
 
 
 template <typename T>
-bool graph_hash_of_mixed_weighted_binary_operations_search(std::vector<pair<int, T>>& input_vector, int key) {
+bool graph_hash_of_mixed_weighted_binary_operations_search(std::vector<std::pair<int, T>>& input_vector, int key) {
 
 	/*return true if key is in vector; time complexity O(log n)*/
 
@@ -35,7 +35,7 @@ bool graph_hash_of_mixed_weighted_binary_operations_search(std::vector<pair<int,
 }
 
 
-double graph_hash_of_mixed_weighted_binary_operations_search_weight(std::vector<pair<int, double>>& input_vector, int key) {
+double graph_hash_of_mixed_weighted_binary_operations_search_weight(std::vector<std::pair<int, double>>& input_vector, int key) {
 
 	/*return std::numeric_limits<double>::max() if key is not in vector; time complexity O(log n)*/
 
@@ -60,7 +60,7 @@ double graph_hash_of_mixed_weighted_binary_operations_search_weight(std::vector<
 
 
 template <typename T>
-int graph_hash_of_mixed_weighted_binary_operations_search_position(std::vector<pair<int, T>>& input_vector, int key) {
+int graph_hash_of_mixed_weighted_binary_operations_search_position(std::vector<std::pair<int, T>>& input_vector, int key) {
 
 	/*return -1 if key is not in vector; time complexity O(log n)*/
 
@@ -87,7 +87,7 @@ int graph_hash_of_mixed_weighted_binary_operations_search_position(std::vector<p
 
 
 template <typename T>
-void graph_hash_of_mixed_weighted_binary_operations_erase(std::vector<pair<int, T>>& input_vector, int key) {
+void graph_hash_of_mixed_weighted_binary_operations_erase(std::vector<std::pair<int, T>>& input_vector, int key) {
 
 	/*erase key from vector; time complexity O(log n + size()-position ), which is O(n) in the worst case, as
 	the time complexity of erasing an element from a vector is the number of elements behind this element*/
@@ -114,7 +114,7 @@ void graph_hash_of_mixed_weighted_binary_operations_erase(std::vector<pair<int, 
 
 
 template <typename T>
-int graph_hash_of_mixed_weighted_binary_operations_insert(std::vector<pair<int, T>>& input_vector, int key, T load) {
+int graph_hash_of_mixed_weighted_binary_operations_insert(std::vector<std::pair<int, T>>& input_vector, int key, T load) {
 
 	/*return the inserted position;
 	

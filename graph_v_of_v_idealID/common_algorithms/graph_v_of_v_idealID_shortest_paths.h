@@ -1,10 +1,12 @@
 
 #pragma once
-
-
-
+#include <vector>
+#include <numeric>
+#include <iostream>
 #include <unordered_map>
 #include <boost/heap/fibonacci_heap.hpp> 
+#include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
+
 
 struct graph_v_of_v_idealID_node_for_sp {
 	int index;
@@ -17,7 +19,7 @@ typedef typename boost::heap::fibonacci_heap<graph_v_of_v_idealID_node_for_sp>::
 
 
 template<typename T> // T is float or double
-void graph_v_of_v_idealID_shortest_paths(graph_v_of_v_idealID& input_graph, int source, vector<T>& distances, vector<int>& predecessors) {
+void graph_v_of_v_idealID_shortest_paths(graph_v_of_v_idealID& input_graph, int source, std::vector<T>& distances, std::vector<int>& predecessors) {
 
 	/*Dijkstra¡¯s shortest path algorithm: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
 	time complexity: O(|E|+|V|log|V|);
@@ -32,8 +34,8 @@ void graph_v_of_v_idealID_shortest_paths(graph_v_of_v_idealID& input_graph, int 
 
 	graph_v_of_v_idealID_node_for_sp node;
 	boost::heap::fibonacci_heap<graph_v_of_v_idealID_node_for_sp> Q;
-	vector<T> Q_keys(N, inf); // if the key of a vertex is inf, then it is not in Q yet
-	vector<handle_t_for_graph_v_of_v_idealID_sp> Q_handles(N);
+	std::vector<T> Q_keys(N, inf); // if the key of a vertex is inf, then it is not in Q yet
+	std::vector<handle_t_for_graph_v_of_v_idealID_sp> Q_handles(N);
 
 	/*initialize the source*/
 	Q_keys[source] = 0;
@@ -88,6 +90,9 @@ void graph_v_of_v_idealID_shortest_paths(graph_v_of_v_idealID& input_graph, int 
 #include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_read_for_GSTP.h>
 #include <graph_hash_of_mixed_weighted/common_algorithms/graph_hash_of_mixed_weighted_shortest_paths.h>
 
+#include <boost/random.hpp>
+boost::random::mt19937 boost_random_time_seed_test_graph_v_of_v_idealID_shortest_paths{ static_cast<std::uint32_t>(std::time(0)) };
+
 void test_graph_v_of_v_idealID_shortest_paths() {
 
 	/*parameters*/
@@ -100,13 +105,15 @@ void test_graph_v_of_v_idealID_shortest_paths() {
 	boost::random::mt19937 gen{ static_cast<std::uint32_t>(now) };
 	for (int i = 0; i < iteration_times; i++) {
 
+		std::cout << "Iteration " << i << std::endl;
+
 		/*input and output*/
 		int generate_new_graph = 1;
 
 		graph_hash_of_mixed_weighted old_hash_graph, old_hash_generated_group_graph;;
 		graph_v_of_v_idealID instance_graph;
 		if (generate_new_graph == 1) {
-			instance_graph = graph_v_of_v_idealID_generate_random_connected_graph(V, E, ec_min, ec_max, precision, boost_random_time_seed);
+			instance_graph = graph_v_of_v_idealID_generate_random_connected_graph(V, E, ec_min, ec_max, precision, boost_random_time_seed_test_graph_v_of_v_idealID_shortest_paths);
 			std::unordered_set<int> generated_group_vertices;
 			graph_v_of_v_idealID generated_group_graph;
 			graph_v_of_v_idealID_save_for_GSTP("simple_iterative_tests.txt", instance_graph, generated_group_graph, generated_group_vertices);
@@ -126,8 +133,8 @@ void test_graph_v_of_v_idealID_shortest_paths() {
 		boost::random::uniform_int_distribution<> dist{ static_cast<int>(0), static_cast<int>(V - 1) };
 		int source = dist(gen);
 
-		vector<double> distances;
-		vector<int> predecessors;
+		std::vector<double> distances;
+		std::vector<int> predecessors;
 		graph_v_of_v_idealID_shortest_paths(instance_graph, source, distances, predecessors);
 
 
@@ -140,20 +147,20 @@ void test_graph_v_of_v_idealID_shortest_paths() {
 			int terminal = dist(gen);
 
 			if (abs(distances[terminal] - distances_hash[terminal]) > 1e-5) {
-				cout << "abs(distances[terminal] - distances_hash[terminal]) > 1e-5" << endl;
-				cout << "source = " << source << endl;
-				cout << "terminal = " << terminal << endl;
-				cout << "distances[terminal] = " << distances[terminal] << endl;
-				cout << "distances_hash[terminal] = " << distances_hash[terminal] << endl;
+				std::cout << "abs(distances[terminal] - distances_hash[terminal]) > 1e-5" << std::endl;
+				std::cout << "source = " << source << std::endl;
+				std::cout << "terminal = " << terminal << std::endl;
+				std::cout << "distances[terminal] = " << distances[terminal] << std::endl;
+				std::cout << "distances_hash[terminal] = " << distances_hash[terminal] << std::endl;
 				getchar();
 			}
 
 			if (predecessors[terminal] != predecessors_hash[terminal]) {
-				cout << "predecessors[terminal] != predecessors[terminal]" << endl;
-				cout << "source = " << source << endl;
-				cout << "terminal = " << terminal << endl;
-				cout << "predecessors[terminal] = " << predecessors[terminal] << endl;
-				cout << "predecessors_hash[terminal] = " << predecessors_hash[terminal] << endl;
+				std::cout << "predecessors[terminal] != predecessors[terminal]" << std::endl;
+				std::cout << "source = " << source << std::endl;
+				std::cout << "terminal = " << terminal << std::endl;
+				std::cout << "predecessors[terminal] = " << predecessors[terminal] << std::endl;
+				std::cout << "predecessors_hash[terminal] = " << predecessors_hash[terminal] << std::endl;
 				getchar();
 			}
 

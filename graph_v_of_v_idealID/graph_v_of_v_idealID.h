@@ -1,14 +1,16 @@
 #pragma once
+#include<vector>
+#include<iostream>
 
 /*this function only suits ideal vertex IDs: from 0 to V-1;
 
 this function is for undirected and edge-weighted graph;
 
-idealize vertex IDs is about fast-hashing vertex IDs*/
+idealizing vertex IDs is about fast-hashing vertex IDs*/
 
 #include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_binary_operations.h>
 
-typedef std::vector<std::vector<pair<int, double>>> graph_v_of_v_idealID;
+typedef std::vector<std::vector<std::pair<int, double>>> graph_v_of_v_idealID;
 
 
 /*
@@ -66,7 +68,7 @@ void graph_v_of_v_idealID_remove_all_adjacent_edges(graph_v_of_v_idealID& g, int
 		graph_hash_of_mixed_weighted_binary_operations_erase(g[it->first], v);
 	}
 
-	std::vector<pair<int, double>>().swap(g[v]);
+	std::vector<std::pair<int, double>>().swap(g[v]);
 
 }
 
@@ -141,7 +143,7 @@ double graph_v_of_v_idealID_total_RAM_MB(graph_v_of_v_idealID& g) {
 	we assume that the edge weight type is float
 	*/
 
-	double bit_num = g.size() * sizeof(std::vector <pair<int, double>>) + graph_v_of_v_idealID_total_edge_num(g) * sizeof(pair<int, double>); // two pointers for each vector
+	double bit_num = g.size() * sizeof(std::vector <std::pair<int, double>>) + graph_v_of_v_idealID_total_edge_num(g) * sizeof(std::pair<int, double>); // two pointers for each vector
 
 	return bit_num / 1024 / 1024;
 }
@@ -156,17 +158,17 @@ graph_v_of_v_idealID graph_v_of_v_idealID_copy_graph(graph_v_of_v_idealID& g) {
 
 void graph_v_of_v_idealID_print(graph_v_of_v_idealID& g) {
 
-	cout << "graph_v_of_v_idealID_print:" << endl;
+	std::cout << "graph_v_of_v_idealID_print:" << std::endl;
 	int size = g.size();
 	for (int i = 0; i < size; i++) {
-		cout << "Vertex " << i << " Adj List: ";
+		std::cout << "Vertex " << i << " Adj List: ";
 		int v_size = g[i].size();
 		for (int j = 0; j < v_size; j++) {
 			std::cout << "<" << g[i][j].first << "," << g[i][j].second << "> ";
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
-	cout << "graph_v_of_v_idealID_print END" << endl;
+	std::cout << "graph_v_of_v_idealID_print END" << std::endl;
 
 }
 
@@ -197,7 +199,17 @@ bool graph_v_of_v_idealID_check_sort(graph_v_of_v_idealID& g) {
 
 
 
+/*examples
+---------------------------
+#include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 
+int main()
+{
+	graph_v_of_v_idealID_example();
+}
+------------------------------------------
+
+*/
 
 
 void test_graph_v_of_v_idealID() {
@@ -240,19 +252,19 @@ void graph_v_of_v_idealID_example() {
 	Get the number of edges, (u,v) and (v,u) only be counted once
 	The output is 45 (10*9/2)
 	*/
-	cout << graph_v_of_v_idealID_total_edge_num(g) << '\n';
+	std::cout << graph_v_of_v_idealID_total_edge_num(g) << '\n';
 
 	/*
 	Get the least weight edge from point 3
 	The output is 0.3, edge is (3,0)
 	*/
-	cout << graph_v_of_v_idealID_smallest_adj_edge_weight(g, 3) << '\n';
+	std::cout << graph_v_of_v_idealID_smallest_adj_edge_weight(g, 3) << '\n';
 
 	/*
 	Check if graph contain the edge (3,1) and get its value
 	The output is 1 1.3
 	*/
-	cout << graph_v_of_v_idealID_contain_edge(g, 3, 1) << " " << graph_v_of_v_idealID_edge_weight(g, 3, 1) << '\n';
+	std::cout << graph_v_of_v_idealID_contain_edge(g, 3, 1) << " " << graph_v_of_v_idealID_edge_weight(g, 3, 1) << '\n';
 
 	/*
 	Remove half of the edge
@@ -268,18 +280,18 @@ void graph_v_of_v_idealID_example() {
 	/*
 	Now the number of edges is 20
 	*/
-	cout << graph_v_of_v_idealID_total_edge_num(g) << '\n';;
+	std::cout << graph_v_of_v_idealID_total_edge_num(g) << '\n';;
 
 	/*
 	Now the least weight edge from point 3 is 1.3
 	Because edge(3,0) is removed
 	*/
-	cout << graph_v_of_v_idealID_smallest_adj_edge_weight(g, 3) << '\n';;
+	std::cout << graph_v_of_v_idealID_smallest_adj_edge_weight(g, 3) << '\n';;
 
 	/*
 	Now the graph no longer contain the edge (3,0) and its value become std::numeric_limits<double>::max()
 	*/
-	cout << graph_v_of_v_idealID_contain_edge(g, 3, 0) << " " << graph_v_of_v_idealID_edge_weight(g, 3, 0) << '\n';
+	std::cout << graph_v_of_v_idealID_contain_edge(g, 3, 0) << " " << graph_v_of_v_idealID_edge_weight(g, 3, 0) << '\n';
 
 
 	graph_v_of_v_idealID_print(g); // print the graph

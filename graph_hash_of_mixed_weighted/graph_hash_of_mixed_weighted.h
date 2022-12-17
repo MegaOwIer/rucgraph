@@ -10,10 +10,10 @@
 class graph_hash_of_mixed_weighted_vectors {
 public:
 	double vertex_weight; // weight of this vertex; only in vectors, not in hashs
-	std::vector<pair<int, double>> adj_vertices; // adjacenct vertices and weights of edges; ordered from small to large
+	std::vector<std::pair<int, double>> adj_vertices; // adjacenct vertices and weights of edges; ordered from small to large
 
 	void clear() {
-		std::vector<pair<int, double>>().swap(adj_vertices);
+		std::vector<std::pair<int, double>>().swap(adj_vertices);
 	}
 };
 
@@ -70,12 +70,12 @@ public:
 	}
 
 
-	vector<pair<int, double>> adj_v_and_ec(int vertex) { // sorted list
+	std::vector<std::pair<int, double>> adj_v_and_ec(int vertex) { // sorted list
 
 		/*this function returns the sorted adjacent vertices of the input vertex;
 		time complexity O(degree of vertex), which is O(|V|) in the worst case*/
 
-		vector<pair<int, double>> adj_list;
+		std::vector<std::pair<int, double>> adj_list;
 
 		auto search = hash_of_hashs.find(vertex);
 		if (search != hash_of_hashs.end()) { // vertex is in hash_of_hashs
@@ -93,10 +93,10 @@ public:
 	}
 
 
-	pair<int, double> min_adj(int vertex) {
+	std::pair<int, double> min_adj(int vertex) {
 		/*return adj edge with min edge cost*/
 
-		pair<int, double> tmp_min = {0, std::numeric_limits<double>::max() };
+		std::pair<int, double> tmp_min = {0, std::numeric_limits<double>::max() };
 
 		auto search = hash_of_hashs.find(vertex);
 		if (search != hash_of_hashs.end()) { // vertex is in hash_of_hashs
@@ -202,7 +202,7 @@ for (auto it1 = movie_links.hash_of_vectors.begin(); it1 != movie_links.hash_of_
 
 
 
-bool graph_hash_of_mixed_weighted_compare(const pair<int, double>&i, const pair<int, double>&j)
+bool graph_hash_of_mixed_weighted_compare(const std::pair<int, double>&i, const std::pair<int, double>&j)
 {
 	return i.first < j.first;  // < is from small to big; > is from big to small.  sort by the first item of pair<int, double>
 } // for graph_hash_of_mixed_weighted_turn_off_hash
@@ -221,7 +221,7 @@ void graph_hash_of_mixed_weighted_turn_off_hash(graph_hash_of_mixed_weighted& in
 	}
 
 	/*sort search1->second.adj_vertices from small to large by vertex ID*/
-	sort(search1->second.adj_vertices.begin(), search1->second.adj_vertices.end(), graph_hash_of_mixed_weighted_compare);
+	std::sort(search1->second.adj_vertices.begin(), search1->second.adj_vertices.end(), graph_hash_of_mixed_weighted_compare);
 
 	input_graph.hash_of_hashs.erase(vertex); // remove vertex from hash_of_hashs
 }
@@ -690,7 +690,7 @@ double graph_hash_of_mixed_weighted_total_RAM_MB(graph_hash_of_mixed_weighted& g
 	we assume that the edge weight type is float; and the structure is vector of vectors (only edge weighted)
 	*/
 
-	double bit_num = (double)graph_hash_of_mixed_weighted_num_vertices(g) * sizeof(std::vector <pair<int, double>>) + graph_hash_of_mixed_weighted_num_edges(g) * sizeof(pair<int, double>); // two pointers for each vector
+	double bit_num = (double)graph_hash_of_mixed_weighted_num_vertices(g) * sizeof(std::vector <std::pair<int, double>>) + graph_hash_of_mixed_weighted_num_edges(g) * sizeof(std::pair<int, double>); // two pointers for each vector
 
 	return bit_num / 1024 / 1024;
 }
@@ -721,12 +721,12 @@ std::list<int> graph_hash_of_mixed_weighted_adjacent_vertices(graph_hash_of_mixe
 }
 
 
-std::list<pair<int, double>> graph_hash_of_mixed_weighted_adjacent_vertices_and_weights(graph_hash_of_mixed_weighted& input_graph, int vertex) {
+std::list<std::pair<int, double>> graph_hash_of_mixed_weighted_adjacent_vertices_and_weights(graph_hash_of_mixed_weighted& input_graph, int vertex) {
 
 	/*this function returns the adjacent vertices of the input vertex;
 	time complexity O(degree of vertex), which is O(|V|) in the worst case*/
 
-	std::list<pair<int, double>> adj_list;
+	std::list<std::pair<int, double>> adj_list;
 
 	auto search = input_graph.hash_of_hashs.find(vertex);
 	if (search != input_graph.hash_of_hashs.end()) { // vertex is in hash_of_hashs
@@ -879,26 +879,26 @@ void test_graph_hash_of_mixed_weighted() {
 	graph_hash_of_mixed_weighted_add_edge(g, 1, 4, 0.5);
 	graph_hash_of_mixed_weighted_add_edge(g, 1, 3, 0.5);
 
-	pair<int, double> min_adj = g.min_adj(1);
-	cout << "min_adj: " << min_adj.first << ", " << min_adj.second << endl;
+	std::pair<int, double> min_adj = g.min_adj(1);
+	std::cout << "min_adj: " << min_adj.first << ", " << min_adj.second << std::endl;
 
 	graph_hash_of_mixed_weighted_print(g);
 
 	std::list<int> xx = graph_hash_of_mixed_weighted_adjacent_vertices(g, 1);
 	print_list_int(xx);
 
-	cout << "graph_hash_of_mixed_weighted_contain_vertex(g,2): " << graph_hash_of_mixed_weighted_contain_vertex(g, 2) << endl;
+	std::cout << "graph_hash_of_mixed_weighted_contain_vertex(g,2): " << graph_hash_of_mixed_weighted_contain_vertex(g, 2) << std::endl;
 	graph_hash_of_mixed_weighted_remove_vertex(g, 2);
-	cout << "graph_hash_of_mixed_weighted_contain_vertex(g,2): " << graph_hash_of_mixed_weighted_contain_vertex(g, 2) << endl;
+	std::cout << "graph_hash_of_mixed_weighted_contain_vertex(g,2): " << graph_hash_of_mixed_weighted_contain_vertex(g, 2) << std::endl;
 
-	cout << "graph_hash_of_mixed_weighted_degree(g,1): " << graph_hash_of_mixed_weighted_degree(g, 1) << endl;
-	cout << "graph_hash_of_mixed_weighted_degree(g,2): " << graph_hash_of_mixed_weighted_degree(g, 2) << endl;
+	std::cout << "graph_hash_of_mixed_weighted_degree(g,1): " << graph_hash_of_mixed_weighted_degree(g, 1) << std::endl;
+	std::cout << "graph_hash_of_mixed_weighted_degree(g,2): " << graph_hash_of_mixed_weighted_degree(g, 2) << std::endl;
 
-	cout << "graph_hash_of_mixed_weighted_edge_weight(g,1,2): " << graph_hash_of_mixed_weighted_edge_weight(g, 1, 2) << endl;
-	cout << "graph_hash_of_mixed_weighted_edge_weight(g,1,3): " << graph_hash_of_mixed_weighted_edge_weight(g, 1, 3) << endl;
+	std::cout << "graph_hash_of_mixed_weighted_edge_weight(g,1,2): " << graph_hash_of_mixed_weighted_edge_weight(g, 1, 2) << std::endl;
+	std::cout << "graph_hash_of_mixed_weighted_edge_weight(g,1,3): " << graph_hash_of_mixed_weighted_edge_weight(g, 1, 3) << std::endl;
 
-	cout << "graph_hash_of_mixed_weighted_contain_edge(g,1,2): " << graph_hash_of_mixed_weighted_contain_edge(g, 1, 2) << endl;
-	cout << "graph_hash_of_mixed_weighted_contain_edge(g,1,3): " << graph_hash_of_mixed_weighted_contain_edge(g, 1, 3) << endl;
+	std::cout << "graph_hash_of_mixed_weighted_contain_edge(g,1,2): " << graph_hash_of_mixed_weighted_contain_edge(g, 1, 2) << std::endl;
+	std::cout << "graph_hash_of_mixed_weighted_contain_edge(g,1,3): " << graph_hash_of_mixed_weighted_contain_edge(g, 1, 3) << std::endl;
 
 
 	
@@ -985,7 +985,7 @@ void graph_hash_of_mixed_weighted_example() {
 		graph_hash_of_mixed_weighted_remove_edge_but_not_isolated_vertices(g, 1, i);
 	}
 	graph_hash_of_mixed_weighted_remove_vertex(g, 2);
-	cout << graph_hash_of_mixed_weighted_num_vertices(g) << " "
+	std::cout << graph_hash_of_mixed_weighted_num_vertices(g) << " "
 		<< graph_hash_of_mixed_weighted_num_edges(g) << " "
 		<< graph_hash_of_mixed_weighted_contain_vertex(g, 0) << " "
 		<< graph_hash_of_mixed_weighted_vertex_list_ID(g, 5) << '\n';
@@ -1009,12 +1009,12 @@ void graph_hash_of_mixed_weighted_example() {
 	}
 	std::list<int>  adjacent_list = graph_hash_of_mixed_weighted_adjacent_vertices(g, 0);
 	for (auto i : adjacent_list)
-		cout << i << " ";
-	cout << '\n';
-	std::list<pair<int, double>>  adjacent_weight_list = graph_hash_of_mixed_weighted_adjacent_vertices_and_weights(g, 5);
+		std::cout << i << " ";
+	std::cout << '\n';
+	std::list<std::pair<int, double>>  adjacent_weight_list = graph_hash_of_mixed_weighted_adjacent_vertices_and_weights(g, 5);
 	for (auto i : adjacent_weight_list)
-		cout << i.first << " " << i.second << " | " << " ";
-	cout << '\n';
+		std::cout << i.first << " " << i.second << " | " << " ";
+	std::cout << '\n';
 	//===============================================================
 		/*
 		Print the information of the graph

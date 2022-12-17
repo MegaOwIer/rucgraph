@@ -1,7 +1,8 @@
 #pragma once
-
+#include <list>
 #include <queue>
-
+#include <vector>
+#include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 
 std::list<std::list<int>> graph_v_of_v_idealID_connected_components(graph_v_of_v_idealID& input_graph) {
 
@@ -13,14 +14,14 @@ std::list<std::list<int>> graph_v_of_v_idealID_connected_components(graph_v_of_v
 
 	/*time complexity: O(V)*/
 	int N = input_graph.size();
-	vector<bool> discovered(N, false);
+	std::vector<bool> discovered(N, false);
 
 	for (int i = 0; i < N; i++) {
 
 		if (discovered[i] == false) {
 
 			std::list<int> component;
-			/*below is a deppth first search; time complexity O(|V|+|E|)*/
+			/*below is a depth first search; time complexity O(|V|+|E|)*/
 			std::queue<int> Q; // Queue is a data structure designed to operate in FIFO (First in First out) context.
 			Q.push(i);
 			component.push_back(i);
@@ -49,3 +50,20 @@ std::list<std::list<int>> graph_v_of_v_idealID_connected_components(graph_v_of_v
 
 }
 
+
+
+
+
+
+
+
+/*
+------------
+#include <graph_v_of_v_idealID/common_algorithms/graph_v_of_v_idealID_connected_components.h>
+
+int main()
+{
+
+}
+-------------
+*/

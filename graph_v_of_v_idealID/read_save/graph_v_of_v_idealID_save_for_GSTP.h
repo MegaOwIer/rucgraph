@@ -1,5 +1,8 @@
 #pragma once
-
+#include <fstream>
+#include <iostream>
+#include <unordered_set>
+#include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 
 
 void graph_v_of_v_idealID_save_for_GSTP(std::string instance_name, graph_v_of_v_idealID& input_graph, graph_v_of_v_idealID& group_graph, std::unordered_set<int>& group_vertices) {
@@ -28,7 +31,7 @@ void graph_v_of_v_idealID_save_for_GSTP(std::string instance_name, graph_v_of_v_
 				outputFile << "input_graph Edge " << i << " " << input_graph[i][j].first << " " << input_graph[i][j].second << '\n';
 			}
 		}
-		outputFile << endl;
+		outputFile << std::endl;
 	}
 	outputFile << std::endl;
 
@@ -44,7 +47,7 @@ void graph_v_of_v_idealID_save_for_GSTP(std::string instance_name, graph_v_of_v_
 				outputFile << "group_graph Edge " << i << " " << group_graph[i][j].first << " " << group_graph[i][j].second << '\n';
 			}
 		}
-		outputFile << endl;
+		outputFile << std::endl;
 	}
 	outputFile << std::endl;
 

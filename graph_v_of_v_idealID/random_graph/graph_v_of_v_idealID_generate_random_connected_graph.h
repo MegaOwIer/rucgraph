@@ -1,7 +1,9 @@
 #pragma once
 
-
+#include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 #include <boost/random.hpp>
+
+
 graph_v_of_v_idealID graph_v_of_v_idealID_generate_random_connected_graph(double V, double E, double ec_min, double ec_max, int input_precision, boost::random::mt19937& boost_random_time_seed) {
 
 	/*time complexity: O(|V||E|)*/
@@ -23,8 +25,8 @@ graph_v_of_v_idealID graph_v_of_v_idealID_generate_random_connected_graph(double
 		}
 	}
 	else if (E > V* (V - 1) / 2) {
-		cout << E << endl;
-		cout << V * (V - 1) / 2 << endl;
+		std::cout << E << std::endl;
+		std::cout << V * (V - 1) / 2 << std::endl;
 		std::cout << "E > V * (V - 1) / 2 in graph_unordered_map_generate_random_connected_graph!" << '\n';
 		exit(1);
 	}
