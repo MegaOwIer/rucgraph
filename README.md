@@ -72,7 +72,7 @@ rucgraph contains <span style="color:red">an augmented Pairing Heap that can cha
 <br/>
 
 
-## Notes for updating files.
+# Notes for updating files.
 
 1. It is preferable to add an example in the front or end of each h file, for describing how to use the codes in the file.
 2. The recorded codes, except those in the build_in_progress folder, should be as stable as possible.
