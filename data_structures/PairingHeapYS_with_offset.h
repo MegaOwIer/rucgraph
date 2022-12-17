@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include<iostream>
 
 /* PairingHeapYS_with_offset is specially designed the fast GW growing algorithm. In this heap,
 there is an offset value for every node. Using these values, we can change the
@@ -284,7 +285,24 @@ public:
 
 
 
-/* examples: */
+/* 
+examples are as follows. 
+
+-------------an example cpp main file-------------------------------
+
+using namespace std;
+
+#include <data_structures/PairingHeapYS_with_offset.h>
+
+int main()
+{
+	example_PairingHeapYS_with_offset();
+}
+
+--------------------------------------------
+
+*/
+
 
 typedef PairingHeapYS_with_offset<double, int> PairingHeapType_example2; // define data types in heap
 
@@ -333,7 +351,7 @@ void example_PairingHeapYS_with_offset() {
 
 }
 
-
+#include<chrono>
 void test_PairingHeapYS_with_offset() {
 
 	vector<double> sizes = { 1e3, 1e4, 1e5, 1e6, 1e7 };
