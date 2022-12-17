@@ -1,6 +1,9 @@
 #pragma once
 
 #include<chrono>
+#include<string>
+#include<vector>
+#include<iostream>
 /* this header file is for a pairing heap;
 see how a pairing heap works: https://www.geeksforgeeks.org/pairing-heap/ 
 
@@ -882,7 +885,21 @@ public:
 
 
 
-/* examples: */
+/* examples: 
+------------------ a cpp file---------------
+using namespace std;
+#include <data_structures/PairingHeapYS.h>
+
+
+int main()
+{
+	example_PairingHeapYS();
+}
+-------------------------------------
+
+*/
+
+
 
 typedef PairingHeapYS<double, int> PairingHeapType_example; // define data types in heap
 
