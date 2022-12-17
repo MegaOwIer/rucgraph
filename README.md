@@ -4,6 +4,10 @@ This is a library of cpp header files mainly used for graph computing tasks.
 
 Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph. Some other descriptions can also be found on this [page](https://yahuisun.github.io/rucgraph/).
 
+<p align="center">
+<img src="/_pages/assets/manual_Kaggle_lowquality.jpg" alt="drawing" width="400"/>
+</p>
+
 <br/>
 
 
