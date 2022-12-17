@@ -28,7 +28,7 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ./a.out
 ```
 , where "-I/root/rucgraph" is to add the path of the rucgraph folder when compiling. Then, you successfully run an example application of an augmented pairing heap, detailed in "PairingHeapYS_with_offset.h".
-![MarineGEO circle logo](/images/202212171254231.png "MarineGEO logo")
+![MarineGEO circle logo](/assets/images/202212171254231.png "MarineGEO logo")
 
 ## Notes for updating files.
 
@@ -36,13 +36,13 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 
 
 
-## Catalog
+## Catalog of rucgraph
 
-### Folder: "build_in_progress"
+### Folder: build_in_progress
 
 This folder contains informal codes.
 
-### Folder: "data_structures"
+### Folder: data_structures
 
 This folder contains some special data structures. 
 
