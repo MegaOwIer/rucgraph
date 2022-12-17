@@ -11,7 +11,7 @@ You can just download the whole repository into a rucgraph folder, and add the p
 
 1. Download the whole rucgraph folder, and save it on the server, e.g., the path of the saved folder is "root/rucgraph".
 
-2. Given a cpp file named as "try.cpp", the contents of which are
+2. Given a cpp file named as "try.cpp", the contents in which are
 ```
 using namespace std;
 
@@ -28,6 +28,7 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ./a.out
 ```
 , where "-I/root/rucgraph" is to add the path of the rucgraph folder when compiling. Then, you successfully run an example application of an augmented pairing heap, detailed in "PairingHeapYS_with_offset.h".
+![MarineGEO circle logo](/images/微信截图_20221217125423 "MarineGEO logo")
 
 ## Notes for updating files.
 
