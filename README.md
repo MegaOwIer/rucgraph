@@ -2,7 +2,7 @@
 
 This is a library of cpp header files mainly used for graph computing tasks.
 
-Here is [a Table of Contents of rucgraph](assets/Introduction.pdf).
+Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph.
 
 <br/>
 
@@ -39,7 +39,7 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 
 ### An example of using both boost and rucgraph on a Linux server
 
-Some header files in rucgraph require [the Boost library](https://www.boost.org/). To use these files, it is required to download the Boost library as well. For example, Given a cpp file named as "try.cpp", the contents in which are
+Some header files in rucgraph require [the Boost library](https://www.boost.org/). To use these files, it is required to download the Boost library as well. For example, given a cpp file named as "try.cpp", the contents in which are
 ```
 #include <graph_v_of_v_idealID/common_algorithms/graph_v_of_v_idealID_shortest_paths.h>
 
@@ -57,6 +57,7 @@ g++ -std=c++17 -I/home/boost_1_75_0 -I/root/rucgraph try.cpp -o a.out
 ![](/assets/images/20221217183837.png)
 
 <br/>
+
 
 
 
