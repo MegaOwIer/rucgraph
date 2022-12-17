@@ -308,6 +308,8 @@ typedef PairingHeapYS_with_offset<double, int> PairingHeapType_example2; // defi
 
 void example_PairingHeapYS_with_offset() {
 
+	cout << "the following are the printing results of running an example of PairingHeapYS_with_offset" << endl;
+
 	std::vector<PairingHeapType_example2::ItemHandle> pairing_heap_buffer; // define handles/pointers for items in heap
 	PairingHeapType_example2 heap; // define heap with handles
 
