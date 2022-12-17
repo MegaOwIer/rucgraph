@@ -1,6 +1,6 @@
 #pragma once
 
-#include <text mining/binary_save_read_vector_of_vectors.h>
+#include <text_mining/binary_save_read_vector_of_vectors.h>
 
 /*
 save graph as vector<vector<pair<int, double>>>; each vector is ..... <v,w_v>, <0/1,NULL> (pairs before the last two pairs is the adj list of v)

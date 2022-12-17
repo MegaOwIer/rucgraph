@@ -82,11 +82,11 @@ void graph_v_of_v_idealID_shortest_paths(graph_v_of_v_idealID& input_graph, int 
 
 
 /*debug codes*/
-#include <graph_v_of_v_idealID/graph_v_of_v_idealID_generate_random_connected_graph.h>
-#include <graph_v_of_v_idealID/graph_v_of_v_idealID_read_for_GSTP.h>
-#include <graph_v_of_v_idealID/graph_v_of_v_idealID_save_for_GSTP.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_read_for_GSTP.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_shortest_paths.h>
+#include <graph_v_of_v_idealID/random_graph/graph_v_of_v_idealID_generate_random_connected_graph.h>
+#include <graph_v_of_v_idealID/read_save/graph_v_of_v_idealID_read_for_GSTP.h>
+#include <graph_v_of_v_idealID/read_save/graph_v_of_v_idealID_save_for_GSTP.h>
+#include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_read_for_GSTP.h>
+#include <graph_hash_of_mixed_weighted/common_algorithms/graph_hash_of_mixed_weighted_shortest_paths.h>
 
 void test_graph_v_of_v_idealID_shortest_paths() {
 

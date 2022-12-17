@@ -1,10 +1,10 @@
 #pragma once
 #include <iostream>
-#include <ThreadPool.h>
+#include <tool_functions/ThreadPool.h>
 #include <shared_mutex>
 #include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
-#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_to_graph_v_of_v_idealID.h>
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_two_hop_labels_v1.h>
+#include <graph_hash_of_mixed_weighted/two_graphs_operations/graph_hash_of_mixed_weighted_to_graph_v_of_v_idealID.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_two_hop_labels_v1.h>
 
  
 

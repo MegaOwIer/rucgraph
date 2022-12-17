@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <text mining/parse_string.h> 
+#include <text_mining/parse_string.h> 
 
 void graph_v_of_v_idealID_read_for_GSTP(std::string instance_name, graph_v_of_v_idealID& input_graph, graph_v_of_v_idealID& group_graph, std::unordered_set<int>& group_vertices) {
 

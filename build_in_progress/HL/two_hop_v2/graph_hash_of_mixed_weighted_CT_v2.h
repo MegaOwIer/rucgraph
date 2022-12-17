@@ -5,10 +5,10 @@
 #include <cmath>
 #include <fstream>
 #include <graph_v_of_v_idealID/graph_v_of_v_idealID.h>
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_two_hop_labels_v1.h>
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_PLL_v1.h>
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_PSL_v1.h>
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v1/graph_hash_of_mixed_weighted_PLL_dummy_v1.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_two_hop_labels_v1.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_PLL_v1.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_PSL_v1.h>
+#include <build_in_progress/HL/two_hop_v1/graph_hash_of_mixed_weighted_PLL_dummy_v1.h>
 
 
 

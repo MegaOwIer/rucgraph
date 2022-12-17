@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fstream>
-#include <text mining/parse_string.h> 
+#include <text_mining/parse_string.h> 
 
 void graph_hash_of_mixed_weighted_read_for_GSTP(std::string instance_name,
 	graph_hash_of_mixed_weighted& input_graph, graph_hash_of_mixed_weighted& group_graph,

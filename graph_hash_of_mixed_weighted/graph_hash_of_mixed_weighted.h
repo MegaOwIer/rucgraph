@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <climits>
 #include <vector>
-#include <print_items.h>
+#include <text_mining/print_items.h>
 #include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_binary_operations.h>
 
 class graph_hash_of_mixed_weighted_vectors {
