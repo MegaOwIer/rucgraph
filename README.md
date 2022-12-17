@@ -33,3 +33,19 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ## Notes for updating files.
 
 1. It is preferable to add an example in the end of each h file, for describing how to use the codes in the file.
+
+
+
+## Catalog
+
+### Folder: "build_in_progress"
+
+This folder contains informal codes.
+
+### Folder: "data_structures"
+
+This folder contains some special data structures. 
+
+#### PairingHeapYS_with_offset.h
+
+This file contains an augmented pairing heap. In this heap, there is an offset value for every inside node. Using these values, we can change the key values of all inside nodes in O(1) time!
