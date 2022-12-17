@@ -1,4 +1,8 @@
 #pragma once
+#include<vector>
+#include<iostream>
+
+
 
 /*
 print_a_sequence_of_elements_v1 suits
@@ -36,7 +40,7 @@ void print_vector_v1(std::vector<T>& input_vector) {
 
 }
 
-void print_vector_pair_int(vector<pair<int, int>>& input_vector) {
+void print_vector_pair_int(std::vector<std::pair<int, int>>& input_vector) {
 
 	std::cout << "print_vector_pair_int:" << std::endl;
 	for (int i = 0; i < input_vector.size(); i++) {

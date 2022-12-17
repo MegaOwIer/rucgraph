@@ -1,9 +1,9 @@
 #pragma once
-
+#include<string>
 
 /*source: https://stackoverflow.com/questions/2896600/how-to-replace-all-occurrences-of-a-character-in-string
 
-this function replace all chars "a" in a string to "b" */
+this function replace all chars "from" in a string to "to" */
 
 std::string replace_chars_in_string(std::string str, const std::string& from, const std::string& to) {
     size_t start_pos = 0;

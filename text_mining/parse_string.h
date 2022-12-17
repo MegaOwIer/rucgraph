@@ -1,6 +1,6 @@
 #pragma once
-
-
+#include<vector>
+#include<string>
 
 std::vector<std::string> parse_string(std::string parse_target, std::string delimiter) {
 
@@ -18,4 +18,24 @@ std::vector<std::string> parse_string(std::string parse_target, std::string deli
 
 	return Parsed_content;
 
+}
+
+
+/*
+-----------
+#include <text_mining/parse_string.h>
+
+int main()
+{
+	example_parse_string();
+}
+----------------
+*/
+
+#include<iostream>
+void example_parse_string() {
+
+	std::string s = "sfgdssddd";
+	auto xx = parse_string(s, "gd");
+	std::cout << xx[0] << "|" << xx[1] << std::endl;
 }

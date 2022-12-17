@@ -1,5 +1,9 @@
 #pragma once
-
+#include<vector>
+#include<string>
+#include<fstream>
+#include<iostream>
+#include<list>
 
 std::vector<std::vector<std::string>> read_csv(std::string file_name) {
 

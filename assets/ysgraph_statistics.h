@@ -4,21 +4,21 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <text mining/list_all_files_in_a_directory.h>
+#include <text_mining/list_all_files_in_a_directory.h>
 #pragma warning(disable : 4996) // https://stackoverflow.com/questions/13550864/error-c4996-ctime-this-function-or-variable-may-be-unsafe 
 
 
 void ysgraph_statistics() {
 
-    queue<string> unchecked_directories;
-    unchecked_directories.push("C:/Users/Yahui/Drive/rucgraph"); // path of ysgraph
+    std::queue<std::string> unchecked_directories;
+    unchecked_directories.push("C:/Users/Yahui/Documents/GitHub/rucgraph"); // path of ysgraph
 
     /*get all_header_files_paths inside the above path*/
-    vector<string> all_header_files_paths;
+    std::vector<std::string> all_header_files_paths;
     while (unchecked_directories.size() > 0) {
-        string path1 = unchecked_directories.front();
+        std::string path1 = unchecked_directories.front();
         unchecked_directories.pop();
-        vector<pair<string, bool>> files = list_all_files_in_a_directory(path1);
+        std::vector<std::pair<std::string, bool>> files = list_all_files_in_a_directory(path1);
         for (int i = 0; i < files.size() && i < 3e2; i++) {
             if (files[i].second) { // sub-directory
                 unchecked_directories.push(path1 + "/" + files[i].first); // an inside directory
@@ -37,8 +37,8 @@ void ysgraph_statistics() {
     for (int i = 0; i < all_header_files_paths.size(); i++) {
 
         /*read a header file*/
-        string line_content;
-        ifstream myfile(all_header_files_paths[i]); // open the file
+        std::string line_content;
+        std::ifstream myfile(all_header_files_paths[i]); // open the file
         int total_lines = 0, total_non_empty_lines = 0, total_string_length = 0;
         while (getline(myfile, line_content)) // read file line by line
         {
@@ -62,14 +62,14 @@ void ysgraph_statistics() {
     /*print statistics*/
     time_t timetoday;
     time(&timetoday);
-    cout << asctime(localtime(&timetoday));
-    cout << "Total number of header files: " << all_header_files_paths.size() << endl;
-    cout << "header_files_total_lines: " << header_files_total_lines << endl;
-    cout << "header_files_total_non_empty_lines: " << header_files_total_non_empty_lines << endl;
-    cout << "header_files_total_string_length: " << header_files_total_string_length << endl;
-    cout << "per_header_file_avg_lines: " << per_header_file_avg_lines << endl;
-    cout << "per_header_file_avg_non_empty_lines: " << per_header_file_avg_non_empty_lines << endl;
-    cout << "per_header_file_avg_string_length: " << per_header_file_avg_string_length << endl;
+    std::cout << asctime(localtime(&timetoday));
+    std::cout << "Total number of header files: " << all_header_files_paths.size() << std::endl;
+    std::cout << "header_files_total_lines: " << header_files_total_lines << std::endl;
+    std::cout << "header_files_total_non_empty_lines: " << header_files_total_non_empty_lines << std::endl;
+    std::cout << "header_files_total_string_length: " << header_files_total_string_length << std::endl;
+    std::cout << "per_header_file_avg_lines: " << per_header_file_avg_lines << std::endl;
+    std::cout << "per_header_file_avg_non_empty_lines: " << per_header_file_avg_non_empty_lines << std::endl;
+    std::cout << "per_header_file_avg_string_length: " << per_header_file_avg_string_length << std::endl;
 }
 
 
@@ -77,10 +77,7 @@ void ysgraph_statistics() {
 /*
 Example main file:
 ------------------------------------------
-
-using namespace std;
-
-#include <text mining/ysgraph_statistics.h>
+#include <assets/ysgraph_statistics.h>
 
 int main()
 {

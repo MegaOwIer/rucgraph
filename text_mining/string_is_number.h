@@ -1,5 +1,5 @@
 #pragma once
-
+#include<string>
 
 bool string_is_number(const std::string& s) {
 

@@ -1,5 +1,5 @@
 #pragma once
-
+#include<string>
 
 bool string_contains_number(const std::string& c) {
 
