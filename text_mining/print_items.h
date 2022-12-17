@@ -9,9 +9,9 @@ print_a_sequence_of_elements_v1 suits
 vector<int>, vector<double>, vector<string>, or lists, or unordered_sets
 */
 template <typename T>
-void print_a_sequence_of_elements_v1(T& input_sequence) {
+void print_a_sequence_of_elements(T& input_sequence) {
 
-	std::cout << "print_a_sequence_of_elements_v1:" << std::endl;
+	std::cout << "print_a_sequence_of_elements:" << std::endl;
 	for (auto it = input_sequence.begin(); it != input_sequence.end(); it++) {
 		std::cout << "item: |" << *it << "|" << std::endl;
 	}
