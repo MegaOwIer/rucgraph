@@ -4,10 +4,13 @@ This is a library of cpp header files mainly used for graph computing tasks.
 
 Here is [an introduction of rucgraph](assets/Introduction.pdf).
 
+<br/>
 
 ## How to use rucgraph
 
 You can just download the whole repository into a rucgraph folder, and add the path of this folder when compiling cpp codes.
+
+<br/>
 
 ### An example of using rucgraph on a Linux server
 
@@ -31,6 +34,8 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ```
 , where "-I/root/rucgraph" is to add the path of the rucgraph folder when compiling. Then, you successfully run an example application of an augmented pairing heap, detailed in "PairingHeapYS_with_offset.h".
 ![MarineGEO circle logo](/assets/images/202212171254231.png "MarineGEO logo")
+
+<br/>
 
 ## Notes for updating files.
 
