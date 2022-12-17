@@ -34,4 +34,4 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 
 ## Notes for updating files.
 
-1. It is preferable to add an example in the end of each h file, for describing how to use the codes in the file.
+1. It is preferable to add an example in the front or end of each h file, for describing how to use the codes in the file.

@@ -1,5 +1,5 @@
 #pragma once
-
+#include<limits.h>
 
 
 template<class output_iterator>
@@ -23,22 +23,16 @@ void convert_number_to_array_of_binary(const unsigned number,
 
 
 /*Example:
-
-for (int i = 0; i < pow(2, NonCompulsoryVertex_Num); i++) {
-
-		graph temporary_graph = copy_graph(instance_graph);
-
-		std::vector<int> count_binary(NonCompulsoryVertex_Num);
-		convert_number_to_array_of_digits(i, std::begin(count_binary), std::end(count_binary));
-
-		std::vector<int> included_vertices = copy_vector_int(CompulsoryVertex);
-		for (int j = 0; j < NonCompulsoryVertex_Num; j++) {
-			if (count_binary[j] == 1) {
-				included_vertices.insert(included_vertices.end(), NonCompulsoryVertex[j]);
-			}
-			else {
-				clear_vertex(NonCompulsoryVertex[j], temporary_graph); // temporary_graph only contain included parts
-			}
-		}
+-------------------------
+#include <text_mining/convert_number_to_array_of_binary.h>
+#include<vector>
+#include<iostream>
+int main()
+{
+	std::vector<int> count_binary(3);
+	convert_number_to_array_of_binary(3, std::begin(count_binary), std::end(count_binary));
+	std::cout << count_binary[2] << count_binary[1] << count_binary[0] << std::endl;
 }
-			*/
+-----------------------------
+
+*/

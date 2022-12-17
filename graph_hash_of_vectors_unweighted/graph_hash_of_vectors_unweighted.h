@@ -1,5 +1,6 @@
 #pragma once
-
+#include<unordered_map>
+#include<vector>
 
 /* define graph: a hash of vectors */
 typedef std::unordered_map<int, std::vector<int>> graph_hash_of_vectors_unweighted;
@@ -72,3 +73,25 @@ void graph_hash_of_vectors_unweighted_add_edge(graph_hash_of_vectors_unweighted&
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+------------a cpp main file----------
+using namespace std;
+#include <graph_hash_of_vectors_unweighted/graph_hash_of_vectors_unweighted.h>
+
+int main()
+{
+
+}
+----------------------------
+*/

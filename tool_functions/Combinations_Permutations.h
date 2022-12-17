@@ -1,4 +1,10 @@
 #pragma once
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <cstdint>
+#include <cassert>
+
 /*Yahui's notes:
 
 source: https://howardhinnant.github.io/combinations/combinations.html#Implementation
@@ -10,25 +16,55 @@ for_each_permutation() is for ordered permutations;
 for_each_reversible_circular_permutation() is for unordered permutations;
 
 
-
-An example:
-
-#include "pch.h"
-#include <iostream>
-#include <vector>
-#include <numeric>
-#include <cstdint>
-#include <cassert>
-#include <Combinations_Permutations.h>
+--------an example------------
 using namespace std;
+#include <tool_functions/Combinations_Permutations.h>
 
+int main()
+{
+    example_permutations_ys();
+}
+
+---------------------------------------
+
+
+
+
+--------------An example cpp file----------------
+using namespace std;
+#include <tool_functions/Combinations_Permutations.h>
+
+int main()
+{
+    const int r = 2;
+    const int n = 3;
+
+    std::vector<int> v = { 4,2,6 };
+
+    std::uint64_t count = for_each_reversible_circular_permutation(v.begin(), v.begin() + r, v.end(), Permutations_f(v.size()));
+
+    std::cout << "Found " << count << " permutations of " << v.size() << " objects taken " << r << " at a time.\n";
+}
+------------------------------------------
+Running results:
+permutation elements: 4, 2 | out of permutation elements: 6
+permutation elements: 4, 6 | out of permutation elements: 2
+permutation elements: 2, 6 | out of permutation elements: 4
+Found 3 permutations of 3 objects taken 2 at a time.
+-----------------------------------------------------------------------
+
+
+
+a description of the caller function:
+
+#include <iostream>
 // functor called for each permutation
-class f
+class Permutations_f
 {
     unsigned len;
     std::uint64_t count;
 public:
-    explicit f(unsigned l) : len(l), count(0) {}
+    explicit Permutations_f(unsigned l) : len(l), count(0) {}
 
     template <class It>
     bool operator()(It first, It last)  // called for each permutation
@@ -66,38 +102,62 @@ public:
     operator std::uint64_t() const { return count; }
 };
 
-int main()
-{
-    const int r = 2;
-    const int n = 3;
-
-    std::vector<int> v = { 4,2,6 };
-
-    std::uint64_t count = for_each_reversible_circular_permutation(v.begin(), v.begin() + r, v.end(), f(v.size()));
-
-    std::cout << "Found " << count << " permutations of " << v.size() << " objects taken " << r << " at a time.\n";
-}
-
-
-
-Running results:
-permutation elements: 4, 2 | out of permutation elements: 6
-permutation elements: 4, 6 | out of permutation elements: 2
-permutation elements: 2, 6 | out of permutation elements: 4
-Found 3 permutations of 3 objects taken 2 at a time.
-
-
-
-
-
-
-
-
 
 
 
 
 */
+
+
+
+
+// functor called for each permutation
+class permutations_ys_function
+{
+    unsigned len;
+    std::uint64_t count;
+    vector<vector<int>> permutation_elements;
+public:
+
+    explicit permutations_ys_function(unsigned l) : len(l), count(0) {}
+
+    template <class It>
+    bool operator()(It first, It last)  // called for each permutation
+    {
+        // count the number of times this is called
+        ++count;
+
+        vector<int> this_permutation_elements;
+        for (auto it = first; it != last; it++) {
+            this_permutation_elements.push_back(*it);
+        }
+        permutation_elements.push_back(this_permutation_elements);
+
+        return false;  // Don't break out of the loop
+    }
+
+    operator std::uint64_t() const { return count; }
+
+    vector<vector<int>> GetVect()
+    {
+        return { permutation_elements };
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1073,3 +1133,52 @@ count_each_reversible_circular_permutation(BidirIter first, BidirIter mid,
     return count_each_reversible_circular_permutation<std::uintmax_t>
         (std::distance(first, mid), std::distance(mid, last));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/*this is an example */
+void example_permutations_ys() {
+
+    const int r = 2;
+    const int n = 3;
+
+    std::vector<int> v = { 4,2,6 };
+
+    /*for_each_reversible_circular_permutation(v.begin(), v.begin() + r, v.end(), f(v.size())) return a f class;
+
+    see #include <Combinations_Permutations.h>:
+
+    template <class BidirIter, class Function>
+Function
+for_each_reversible_circular_permutation(BidirIter first,
+    BidirIter mid,
+    BidirIter last, Function f)
+{
+    for_each_combination(first, mid, last, detail::reverse_circular_permutation<Function&,
+        BidirIter>(f, std::distance(first, mid)));
+    return f;
+}*/
+    std::vector<vector<int>> permutation_elements = for_each_reversible_circular_permutation(v.begin(), v.begin() + r, v.end(), permutations_ys_function(v.size())).GetVect();
+
+    cout << "permutation elements: " << endl; // from first to last
+    for (int i = 0; i < permutation_elements.size(); i++) {
+        for (int j = 0; j < permutation_elements[i].size(); j++) {
+            cout << permutation_elements[i][j];
+            if (j != permutation_elements[i].size() - 1) {
+                cout << ", ";
+            }
+        }
+        cout << endl;
+    }
+    std::cout << "Found " << permutation_elements.size() << " permutations of " << v.size() << " objects taken " << r << " at a time.\n";
+}
+

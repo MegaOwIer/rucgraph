@@ -1,5 +1,6 @@
 #pragma once
-
+#include<unordered_map>
+#include<vector>
 
 /* define graph: a hash of vectors */
 
@@ -275,6 +276,25 @@ long int graph_hash_of_vectors_weighted_num_edges(graph_hash_of_vectors_weighted
 	return num / 2;
 
 }
+
+
+
+
+/*below are examples
+
+---------a cpp main file--------------
+using namespace std;
+#include <graph_hash_of_vectors_weighted/graph_hash_of_vectors_weighted.h>
+
+int main()
+{
+
+}
+--------------------------
+*/
+#include<iostream>
+
+
 
 void graph_hash_of_vectors_weighted_print(graph_hash_of_vectors_weighted& input_graph) {
 

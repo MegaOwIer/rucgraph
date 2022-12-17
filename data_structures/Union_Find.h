@@ -22,6 +22,8 @@ https://stackoverflow.com/questions/8300125/union-find-data-structure
 https://github.com/kartikkukreja/blog-codes/blob/master/src/Union%20Find%20%28Disjoint%20Set%29%20Data%20Structure.cpp#L46
 */
 
+#include<vector>
+
 void Union_Find_initialization(vector<int>& parent, vector<int>& set_size) { // pass arrays
 
 	/*we assume that parent, and set_size are arrays with the same size*/
@@ -77,7 +79,11 @@ bool Union_Find_in_the_same_Union(int x, int y, vector<int>& parent) {
 }
 
 
-void try_Union_Find() {
+
+/*below is an example*/
+
+#include<iostream>
+void example_Union_Find() {
 
 	int sets_num = 5;
 	vector<int> parent(sets_num), set_size(sets_num);

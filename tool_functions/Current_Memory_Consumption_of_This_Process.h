@@ -70,3 +70,19 @@ double Current_Memory_Consumption_of_This_Process() {
 
 }
 
+
+/*an example main file:
+
+-------------------
+#include <tool_functions/Current_Memory_Consumption_of_This_Process.h>
+//using namespace std;" must be below #include <tool_functions/Current_Memory_Consumption_of_This_Process.h>! Or there is a conflict of the name byte!
+
+#include<iostream>
+
+int main()
+{
+	std::cout << Current_Memory_Consumption_of_This_Process() << "MB";
+}
+----------------------------------------
+*/
+
