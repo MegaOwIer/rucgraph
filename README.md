@@ -6,11 +6,11 @@ Here is [an introduction of rucgraph](assets/Introduction.pdf).
 
 <br/>
 
+
+
 ## How to use rucgraph
 
 You can just download the whole repository into a rucgraph folder, and add the path of this folder when compiling cpp codes.
-
-<br/>
 
 ### An example of using rucgraph on a Linux server
 
@@ -36,6 +36,8 @@ g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ![MarineGEO circle logo](/assets/images/202212171254231.png "MarineGEO logo")
 
 <br/>
+
+
 
 ## Notes for updating files.
 
