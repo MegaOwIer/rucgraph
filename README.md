@@ -22,13 +22,12 @@ int main()
 	example_PairingHeapYS_with_offset();
 }
 ```
-, where "PairingHeapYS_with_offset.h" is a header file in rucgraph. In the terminal, compile the above file using the following command.
+, where "PairingHeapYS_with_offset.h" is a header file in rucgraph. In the terminal, compile and run the above codes using the following commands:
 ```
 g++ -std=c++17 -I/root/rucgraph try.cpp a.out
 ./a.out
 ```
-
-
+, where "-I/root/rucgraph" is to add the path of the rucgraph folder when compiling. Then, you successfully run an example application of an augmented pairing heap, detailed in "PairingHeapYS_with_offset.h".
 
 ## Notes for updating files.
 
