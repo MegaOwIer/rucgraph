@@ -11,8 +11,7 @@ You can just download the whole repository into a rucgraph folder, and add the p
 
 1. Download the whole rucgraph folder, and save it on the server, e.g., the path of the saved folder is "root/rucgraph".
 
-2. In the terminal, compile a cpp file named as "try.cpp", the contents of which are
-
+2. Given a cpp file named as "try.cpp", the contents of which are
 ```
 using namespace std;
 
@@ -22,6 +21,11 @@ int main()
 {
 	example_PairingHeapYS_with_offset();
 }
+```
+, where "PairingHeapYS_with_offset.h" is a header file in rucgraph. In the terminal, compile the above file using the following command.
+```
+g++ -std=c++17 -I/root/rucgraph try.cpp a.out
+./a.out
 ```
 
 
