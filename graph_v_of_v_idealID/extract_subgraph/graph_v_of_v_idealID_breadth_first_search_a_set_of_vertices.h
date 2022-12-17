@@ -1,12 +1,14 @@
 #pragma once
+#include<queue>
+#include<graph_v_of_v_idealID/graph_v_of_v_idealID.h>
 
-vector<int> graph_v_of_v_idealID_breadth_first_search_a_set_of_vertices(graph_v_of_v_idealID& input_graph, int root) {
+std::vector<int> graph_v_of_v_idealID_breadth_first_search_a_set_of_vertices(graph_v_of_v_idealID& input_graph, int root) {
 
 	int N = input_graph.size();
 
-	vector<int> root_component; // v is connected to root; including root
+	std::vector<int> root_component; // v is connected to root; including root
 
-	vector<bool> unprocessed(N, true); // mark non-root as un-discovered
+	std::vector<bool> unprocessed(N, true); // mark non-root as un-discovered
 	unprocessed[root] = false; // mark root as discovered
 
 	std::queue<int> Q; // Queue is a data structure designed to operate in FIFO (First in First out) context.

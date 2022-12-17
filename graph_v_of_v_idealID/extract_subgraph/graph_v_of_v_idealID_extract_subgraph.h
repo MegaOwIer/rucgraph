@@ -1,7 +1,9 @@
 #pragma once
+#include<unordered_set>
+#include<graph_v_of_v_idealID/graph_v_of_v_idealID.h>
+#include<graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted.h>
 
-
-graph_hash_of_mixed_weighted graph_v_of_v_idealID_extract_subgraph(graph_v_of_v_idealID& input_graph, unordered_set<int>& V_set) {
+graph_hash_of_mixed_weighted graph_v_of_v_idealID_extract_subgraph(graph_v_of_v_idealID& input_graph, std::unordered_set<int>& V_set) {
 
 	/*extract a smaller_graph, which contains all the vertices in V_set,
 	and all the edges between vertices in V_set;
