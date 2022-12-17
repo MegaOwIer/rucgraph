@@ -61,6 +61,15 @@ g++ -std=c++17 -I/home/boost_1_75_0 -I/root/rucgraph try.cpp -o a.out
 <br/>
 
 
+# Highlights
+
+## A Pairing Heap that can change all keys in O(1) time
+
+rucgraph contains <span style="color:red">an augmented Pairing Heap that can change all keys in O(1) time!</span> It achieves this by associating an offset value with each node in the heap. To use this heap, include the following header file in your codes.
+```
+#include <data_structures/PairingHeapYS_with_offset.h>
+```
+<br/>
 
 
 ## Notes for updating files.
