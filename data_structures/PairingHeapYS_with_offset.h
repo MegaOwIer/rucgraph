@@ -352,6 +352,7 @@ void example_PairingHeapYS_with_offset() {
 }
 
 #include<chrono>
+#include <math.h>
 void test_PairingHeapYS_with_offset() {
 
 	vector<double> sizes = { 1e3, 1e4, 1e5, 1e6, 1e7 };
