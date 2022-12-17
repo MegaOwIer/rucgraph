@@ -8,8 +8,6 @@ Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph. Some other d
 <img src="/assets/images/manual_Kaggle_lowquality.jpg" alt="drawing" width="200"/>
 </p>
 
-<br/>
-
 
 
 ## How to use rucgraph
