@@ -12,6 +12,8 @@ Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph. Some other d
 
 ## How to use rucgraph
 
+<b>Normally, there is an example code in each header file to explain how to use the codes in this file. If there is not, you can add a mark, e.g., "/\*an example is needed\*/", in the end of this file, and then pull a request. I will add an example ASAP.</b>
+
 You can download the whole repository into a rucgraph folder, and add the path of this folder when compiling cpp codes.
 
 
