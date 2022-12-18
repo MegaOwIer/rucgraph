@@ -134,7 +134,7 @@ long long int dgraph_v_of_v<weight_type>::edge_number() {
 /*
 examples
 ----------------------
-#include <build_in_progress/dgraph_v_of_v/dgraph_v_of_v.h>
+#include <dgraph_v_of_v/dgraph_v_of_v.h>
 
 int main()
 {
