@@ -34,10 +34,10 @@ bool graph_hash_of_mixed_weighted_binary_operations_search(std::vector<std::pair
 
 }
 
+template <typename T>
+T graph_hash_of_mixed_weighted_binary_operations_search_weight(std::vector<std::pair<int, T>>& input_vector, int key) {
 
-double graph_hash_of_mixed_weighted_binary_operations_search_weight(std::vector<std::pair<int, double>>& input_vector, int key) {
-
-	/*return std::numeric_limits<double>::max() if key is not in vector; time complexity O(log n)*/
+	/*return std::numeric_limits<T>::max() if key is not in vector; time complexity O(log n)*/
 
 	int left = 0, right = input_vector.size() - 1;
 
@@ -54,7 +54,7 @@ double graph_hash_of_mixed_weighted_binary_operations_search_weight(std::vector<
 		}
 	}
 
-	return std::numeric_limits<double>::max();
+	return std::numeric_limits<T>::max();
 
 }
 

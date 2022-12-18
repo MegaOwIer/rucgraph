@@ -44,7 +44,6 @@ void graph_v_of_v_idealID_add_edge(graph_v_of_v_idealID& g, int e1, int e2, doub
 
 }
 
-
 void graph_v_of_v_idealID_remove_edge(graph_v_of_v_idealID& g, int e1, int e2) {
 
 	/*we assume that the size of g is larger than e1 or e2*/
@@ -72,7 +71,6 @@ void graph_v_of_v_idealID_remove_all_adjacent_edges(graph_v_of_v_idealID& g, int
 
 }
 
-
 bool graph_v_of_v_idealID_contain_edge(graph_v_of_v_idealID& g, int e1, int e2) {
 
 	/*
@@ -83,7 +81,6 @@ bool graph_v_of_v_idealID_contain_edge(graph_v_of_v_idealID& g, int e1, int e2) 
 	return graph_hash_of_mixed_weighted_binary_operations_search(g[e1], e2);
 
 }
-
 
 double graph_v_of_v_idealID_edge_weight(graph_v_of_v_idealID& g, int e1, int e2) {
 
@@ -118,8 +115,6 @@ double graph_v_of_v_idealID_smallest_adj_edge_weight(graph_v_of_v_idealID& input
 
 }
 
-
-
 long long int graph_v_of_v_idealID_total_edge_num(graph_v_of_v_idealID& g) {
 
 	/*
@@ -148,14 +143,6 @@ double graph_v_of_v_idealID_total_RAM_MB(graph_v_of_v_idealID& g) {
 	return bit_num / 1024 / 1024;
 }
 
-
-graph_v_of_v_idealID graph_v_of_v_idealID_copy_graph(graph_v_of_v_idealID& g) {
-
-	return g;
-
-}
-
-
 void graph_v_of_v_idealID_print(graph_v_of_v_idealID& g) {
 
 	std::cout << "graph_v_of_v_idealID_print:" << std::endl;
@@ -171,7 +158,6 @@ void graph_v_of_v_idealID_print(graph_v_of_v_idealID& g) {
 	std::cout << "graph_v_of_v_idealID_print END" << std::endl;
 
 }
-
 
 bool graph_v_of_v_idealID_check_sort(graph_v_of_v_idealID& g) {
 
