@@ -2,7 +2,11 @@
 
 This is a library of cpp header files mainly used for graph computing tasks.
 
-Here is [a Table of Contents](assets/Introduction.pdf) of rucgraph. Some other descriptions can also be found on this [page](https://yahuisun.github.io/rucgraph/).
+Here is [a Table of Contents](assets/Introduction.pdf). Some other descriptions can be found on this [page](https://yahuisun.github.io/rucgraph/).
+
+<b>Welcome to joining the development of rucgraph by pulling requests!</b>
+
+
 
 <p align="center">
 <img src="/assets/images/manual_Kaggle_lowquality.jpg" alt="drawing" width="200"/>
