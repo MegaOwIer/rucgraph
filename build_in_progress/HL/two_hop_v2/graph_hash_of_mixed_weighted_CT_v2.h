@@ -1020,8 +1020,8 @@ void CT_extract_path(graph_hash_of_mixed_weighted_CT_v2_case_info& case_info, in
 
 	/*may return INT_MAX, INT_MAX*/
 
-	//cout << "CT_extract_path " << source << " " << terminal << endl;
-	//getchar();
+	// cout << "CT_extract_path " << source << " " << terminal << endl;
+	// getchar();
 
 	auto& root = case_info.root;
 	auto& isIntree = case_info.isIntree;
@@ -1122,7 +1122,7 @@ void CT_extract_path(graph_hash_of_mixed_weighted_CT_v2_case_info& case_info, in
 
 		return;
 	}
-	else  if (root[source] != root[terminal])  // locate in different trees
+	else if (root[source] != root[terminal])  // locate in different trees
 	{
 		//cout << "c" << endl;
 		int r_s = root[source];
