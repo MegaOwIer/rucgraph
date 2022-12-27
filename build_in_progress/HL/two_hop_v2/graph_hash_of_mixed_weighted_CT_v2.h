@@ -196,7 +196,6 @@ public:
 
 };
 
-
 /*global values*/
 graph_v_of_v_idealID global_ideal_graph_CT;
 vector<vector<midnode>> global_midnode_graph;  // midnode_graph[i][j].left Àëi½ü£¬midnode_graph[i][j].rightÀëj½ü

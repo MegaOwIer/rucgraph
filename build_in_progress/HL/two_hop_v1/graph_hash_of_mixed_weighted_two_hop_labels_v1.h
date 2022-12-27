@@ -281,7 +281,8 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1_for_can
 		return 0;
 	}
 
-	vector<double> selected_distance = { std::numeric_limits<double>::max() }; // Store all path lengths to be selected; disconnected = std::numeric_limits<double>::max()
+	double min_selected_distance = std::numeric_limits<double>::max(); // disconnected = std::numeric_limits<double>::max()
+	//vector<double> selected_distance = { std::numeric_limits<double>::max() }; // Store all path lengths to be selected; disconnected = std::numeric_limits<double>::max()
 	auto s_adj_begin = adjs_new_IDs[source].begin();
 	auto s_adj_end = adjs_new_IDs[source].end();
 	auto t_adj_begin = adjs_new_IDs[terminal].begin();
@@ -301,7 +302,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1_for_can
 							return x;
 						}
 						else {
-							selected_distance.push_back(x + double(it1->second) + double(it2->second));
+							min_selected_distance = min(min_selected_distance, x + double(it1->second) + double(it2->second));
 						}
 					}
 				}
@@ -318,7 +319,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1_for_can
 						return x;
 					}
 					else {
-						selected_distance.push_back(x + double(it1->second));
+						min_selected_distance = min(min_selected_distance, x + double(it1->second));
 					}
 				}
 			}
@@ -337,7 +338,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1_for_can
 						return x;
 					}
 					else {
-						selected_distance.push_back(x + double(it2->second));
+						min_selected_distance = min(min_selected_distance, x + double(it2->second));
 					}
 				}
 			}
@@ -345,13 +346,11 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1_for_can
 		else
 		{
 			/*"Nothing happened"*/
-			selected_distance.push_back(graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc_for_canonical_repair(source, terminal, target_v));
+			min_selected_distance = min(min_selected_distance, graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc_for_canonical_repair(source, terminal, target_v));
 		}
 	}
 
-	double dis = *min_element(selected_distance.begin(), selected_distance.end());
-
-	return dis;
+	return min_selected_distance;
 }
 
 double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_for_canonical_repair(graph_hash_of_mixed_weighted& instance_graph, int source, int terminal, int target_v)
@@ -368,8 +367,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_for_canonical_re
 		{
 			if (f_2019R1_new_ID[source] == f_2019R1_new_ID[terminal])
 			{
-				pair<int, double> s_min_adj = min_adjs_new_IDs[source];
-				return double(s_min_adj.second * 2);
+				return min_adjs_new_IDs[source].second * 2;
 			}
 			else
 			{
@@ -401,9 +399,8 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_for_canonical_re
 		{
 			if (f_2019R1_new_ID[source] == f_2019R1_new_ID[terminal])
 			{
-				pair<int, double> s_min_adj = min_adjs_new_IDs[source];
-				double s_t_weight = double(graph_hash_of_mixed_weighted_edge_weight(instance_graph, source, terminal));
-				return double(s_min_adj.second * 2) > s_t_weight ? s_t_weight : double(s_min_adj.second * 2);
+				double s_t_weight = graph_hash_of_mixed_weighted_edge_weight(instance_graph, source, terminal);
+				return double(min_adjs_new_IDs[source].second * 2) > s_t_weight ? s_t_weight : double(min_adjs_new_IDs[source].second * 2);
 			}
 			else
 			{
@@ -637,12 +634,12 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1 /* we a
 	//cout << "reduction_measures_2019R2[source] " << reduction_measures_2019R2[source] << endl;
 	//cout << "reduction_measures_2019R2[terminal] " << reduction_measures_2019R2[terminal] << endl;
 
-
 	if (source == terminal) {
 		return 0;
 	}
 
-	vector<double> selected_distance = { std::numeric_limits<double>::max() }; // Store all path lengths to be selected; disconnected = std::numeric_limits<double>::max()
+	double min_selected_distance = std::numeric_limits<double>::max(); // disconnected = std::numeric_limits<double>::max()
+	//vector<double> selected_distance = { std::numeric_limits<double>::max() }; // Store all path lengths to be selected; disconnected = std::numeric_limits<double>::max()
 	auto s_adj_begin = adjs[source].begin();
 	auto s_adj_end = adjs[source].end();
 	auto t_adj_begin = adjs[terminal].begin();
@@ -662,7 +659,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1 /* we a
 							return x;
 						}
 						else {
-							selected_distance.push_back(x + double(it1->second) + double(it2->second));
+							min_selected_distance = min(min_selected_distance, x + double(it1->second) + double(it2->second));
 						}
 					}
 				}
@@ -681,7 +678,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1 /* we a
 						return x;
 					}
 					else {
-						selected_distance.push_back(x + double(it1->second));
+						min_selected_distance = min(min_selected_distance, x + double(it1->second));
 					}
 				}
 			}
@@ -703,7 +700,7 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1 /* we a
 						return x;
 					}
 					else {
-						selected_distance.push_back(x + double(it2->second));
+						min_selected_distance = min(min_selected_distance, x + double(it2->second));
 					}
 				}
 			}
@@ -711,13 +708,11 @@ double graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_st_no_R1 /* we a
 		else
 		{
 			/*"Nothing happened"*/
-			selected_distance.push_back(graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, source, terminal));
+			min_selected_distance = min(min_selected_distance, graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, source, terminal));
 		}
 	}
 
-	double dis = *min_element(selected_distance.begin(), selected_distance.end());
-
-	return dis;
+	return min_selected_distance;
 }
 
 vector<pair<int, int>> graph_hash_of_mixed_weighted_two_hop_v1_extract_shortest_path_st_no_R1 /* we assume that source and terminal are not reduced by 2019R1*/

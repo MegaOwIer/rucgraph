@@ -71,7 +71,7 @@ double canonical_query_path_extract_distance_no_reduc(vector<vector<two_hop_labe
 }
 
 double canonical_query_path_extract_distance_st_no_R1 /* we assume that source and terminal are not reduced by 2019R1 here*/
-(vector<vector<two_hop_label_v1>>& L, vector<int>& reduction_measures_2019R2, vector<int>& f_2019R1, int source, int terminal, pair<bool, int>& common_hub_checked)
+(vector<vector<two_hop_label_v1>>& L, vector<int>& reduction_measures_2019R2, vector<int>& f_2019R1, int source, int terminal)
 {
 
 	/* we assume that source and terminal are not reduced by 2019R1*/
@@ -81,12 +81,12 @@ double canonical_query_path_extract_distance_st_no_R1 /* we assume that source a
 	//cout << "reduction_measures_2019R2[source] " << reduction_measures_2019R2[source] << endl;
 	//cout << "reduction_measures_2019R2[terminal] " << reduction_measures_2019R2[terminal] << endl;
 
-
 	if (source == terminal) {
 		return 0;
 	}
 
-	vector<double> selected_distance = { std::numeric_limits<double>::max() }; // Store all path lengths to be selected; disconnected = std::numeric_limits<double>::max()
+	double min_selected_distance = std::numeric_limits<double>::max(); // disconnected = std::numeric_limits<double>::max()
+	//vector<double> selected_distance = { std::numeric_limits<double>::max() }; // Store all path lengths to be selected; disconnected = std::numeric_limits<double>::max()
 	auto s_adj_begin = adjs[source].begin();
 	auto s_adj_end = adjs[source].end();
 	auto t_adj_begin = adjs[terminal].begin();
@@ -101,12 +101,12 @@ double canonical_query_path_extract_distance_st_no_R1 /* we assume that source a
 				for (auto it2 = t_adj_begin; it2 != t_adj_end; it2++)
 				{
 					if (f_2019R1[it1->first] == it1->first && f_2019R1[it2->first] == it2->first) {
-						double x = canonical_query_path_extract_distance_no_reduc(L, it1->first, it2->first, common_hub_checked);
+						double x = graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, it1->first, it2->first);
 						if (x == std::numeric_limits<double>::max() && full_two_hop_labels) { // if not full_two_hop_labels, then we may query a max dis while connected
 							return x;
 						}
 						else {
-							selected_distance.push_back(x + double(it1->second) + double(it2->second));
+							min_selected_distance = min(min_selected_distance, x + double(it1->second) + double(it2->second));
 						}
 					}
 				}
@@ -119,13 +119,13 @@ double canonical_query_path_extract_distance_st_no_R1 /* we assume that source a
 			for (auto it1 = s_adj_begin; it1 != s_adj_end; it1++)
 			{
 				//cout << "it1->first: " << it1->first << " it1->second: " << it1->second << endl;
-				if (f_2019R1[it1->first] == it1->first) { 
+				if (f_2019R1[it1->first] == it1->first) {
 					double x = graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, it1->first, terminal);
 					if (x == std::numeric_limits<double>::max() && full_two_hop_labels) {
 						return x;
 					}
 					else {
-						selected_distance.push_back(x + double(it1->second));
+						min_selected_distance = min(min_selected_distance, x + double(it1->second));
 					}
 				}
 			}
@@ -140,14 +140,14 @@ double canonical_query_path_extract_distance_st_no_R1 /* we assume that source a
 			for (auto it2 = t_adj_begin; it2 != t_adj_end; it2++)
 			{
 				//cout << "it2->first: " << it2->first << " it2->second: " << it2->second << endl;
-				if (f_2019R1[it2->first] == it2->first) { 
+				if (f_2019R1[it2->first] == it2->first) {
 					double x = graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, source, it2->first);
 					//cout << "x " << x << endl;
 					if (x == std::numeric_limits<double>::max() && full_two_hop_labels) {
 						return x;
 					}
 					else {
-						selected_distance.push_back(x + double(it2->second));
+						min_selected_distance = min(min_selected_distance, x + double(it2->second));
 					}
 				}
 			}
@@ -155,13 +155,11 @@ double canonical_query_path_extract_distance_st_no_R1 /* we assume that source a
 		else
 		{
 			/*"Nothing happened"*/
-			selected_distance.push_back(graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, source, terminal));
+			min_selected_distance = min(min_selected_distance, graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, source, terminal));
 		}
 	}
 
-	double dis = *min_element(selected_distance.begin(), selected_distance.end());
-
-	return dis;
+	return min_selected_distance;
 }
 
 vector<pair<int, int>> canonical_query_path_extract_shortest_path_st_no_R1 /* we assume that source and terminal are not reduced by 2019R1*/
@@ -379,8 +377,7 @@ double canonical_query_path_extract_distance
 		{
 			if (f_2019R1[source] == f_2019R1[terminal])
 			{
-				pair<int, double> s_min_adj = min_adjs[source];
-				return double(s_min_adj.second * 2);
+				return double(min_adjs[source].second * 2);
 			}
 			else
 			{
@@ -408,9 +405,8 @@ double canonical_query_path_extract_distance
 		{
 			if (f_2019R1[source] == f_2019R1[terminal])
 			{
-				pair<int, double> s_min_adj = min_adjs[source];
 				double s_t_weight = double(graph_hash_of_mixed_weighted_edge_weight(instance_graph, source, terminal));
-				return double(s_min_adj.second * 2) > s_t_weight ? s_t_weight : double(s_min_adj.second * 2);
+				return double(min_adjs[source].second * 2) > s_t_weight ? s_t_weight : double(min_adjs[source].second * 2);
 			}
 			else
 			{

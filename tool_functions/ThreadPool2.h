@@ -1,29 +1,34 @@
-/*this is from https://github.com/progschj/ThreadPool 
+/*this is from https://github.com/progschj/ThreadPool2 
 
 an explanation: https://www.cnblogs.com/chenleideblog/p/12915534.html
+
+ThreadPool uses mutex, while ThreadPool2 uses shared_mutex
+
+std::shared_mutex和std::mutex的性能对比(benchmark):
+https://blog.csdn.net/analogous_love/article/details/97918304
 */
 
 
-#ifndef THREAD_POOL_H
-#define THREAD_POOL_H
+#ifndef THREAD_POOL_H2
+#define THREAD_POOL_H2
 
 #include <vector>
 #include <queue>
 #include <memory>
 #include <thread>
-#include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <future>
 #include <functional>
 #include <stdexcept>
 
-class ThreadPool {
+class ThreadPool2 {
 public:
-    ThreadPool(size_t); // 线程池的构造函数
+    ThreadPool2(size_t); // 线程池的构造函数
     template<class F, class... Args>
     auto enqueue(F&& f, Args&&... args) 
         -> std::future<typename std::result_of<F(Args...)>::type>; // 将任务添加到线程池的任务队列中
-    ~ThreadPool(); // 线程池的析构函数
+    ~ThreadPool2(); // 线程池的析构函数
 private:
     // need to keep track of threads so we can join them
     std::vector< std::thread > workers; // 用于存放线程的数组，用vector容器保存
@@ -31,13 +36,16 @@ private:
     std::queue< std::function<void()> > tasks; // 用于存放任务的队列，用queue队列进行保存。任务类型为std::function<void()>。因为std::function是通用多态函数封装器，本质上任务队列中存放的是一个个函数
     
     // synchronization
-    std::mutex queue_mutex; // 一个访问任务队列的互斥锁，在插入任务或者线程取出任务都需要借助互斥锁进行安全访问
-    std::condition_variable condition; // 一个用于通知线程任务队列状态的条件变量，若有任务则通知线程可以执行，否则进入wait状态
+    std::shared_mutex queue_mutex; // 一个访问任务队列的互斥锁，在插入任务或者线程取出任务都需要借助互斥锁进行安全访问
+
+    /*此处不能用condition_variable，因为其是专为mutex设计的，不能用于shared_mutex*/
+    std::condition_variable_any condition; // 一个用于通知线程任务队列状态的条件变量，若有任务则通知线程可以执行，否则进入wait状态
+
     bool stop; // 标识线程池的状态，用于构造与析构中对线程池状态的了解
 };
  
 // the constructor just launches some amount of workers
-inline ThreadPool::ThreadPool(size_t threads) // 构造函数定义为inline。接收参数threads表示线程池中要创建多少个线程。
+inline ThreadPool2::ThreadPool2(size_t threads) // 构造函数定义为inline。接收参数threads表示线程池中要创建多少个线程。
     :   stop(false) // stop初始为false，即表示线程池启动着。
 {
     for(size_t i = 0;i<threads;++i) // 进入for循环，依次创建threads个线程，并放入线程数组workers中。
@@ -58,7 +66,7 @@ inline ThreadPool::ThreadPool(size_t threads) // 构造函数定义为inline。接收参数t
                     std::function<void()> task; // 在循环中，先创建一个封装void()函数的std::function对象task，用于接收后续从任务队列中弹出的真实任务。
 
                     {
-                        std::unique_lock<std::mutex> lock(this->queue_mutex); // 该{}内，queue_mutex处于锁状态
+                        std::unique_lock<std::shared_mutex> lock(this->queue_mutex); // 该{}内，queue_mutex处于锁状态
 
                         /*即其表示若线程池已停止或者任务队列中不为空，则不会进入到wait状态。
                           由于刚开始创建线程池，线程池表示未停止，且任务队列为空，所以每个线程都会进入到wait状态。
@@ -96,7 +104,7 @@ std::future<typename std::result_of<F(Args...)>::type> //std::future用来访问异步
 最终返回的是放在std::future中的F(Args…)返回类型的异步执行结果。
 */
 template<class F, class... Args>
-auto ThreadPool::enqueue(F&& f, Args&&... args) 
+auto ThreadPool2::enqueue(F&& f, Args&&... args) 
     -> std::future<typename std::result_of<F(Args...)>::type> // 表示返回类型，与lambda表达式中的表示方法一样。
 {
     using return_type = typename std::result_of<F(Args...)>::type; // 获得以Args为参数的F的函数类型的返回类型
@@ -107,11 +115,11 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
         
     std::future<return_type> res = task->get_future(); // res中保存了类型为return_type的变量，有task异步执行完毕才可以将值保存进去
     {
-        std::unique_lock<std::mutex> lock(queue_mutex);
+        std::unique_lock<std::shared_mutex> lock(queue_mutex);
 
         // don't allow enqueueing after stopping the pool
         if(stop)
-            throw std::runtime_error("enqueue on stopped ThreadPool");
+            throw std::runtime_error("enqueue on stopped ThreadPool2");
 
         tasks.emplace([task](){ (*task)(); });
     }
@@ -120,13 +128,13 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
 }
 
 // the destructor joins all threads
-inline ThreadPool::~ThreadPool()
+inline ThreadPool2::~ThreadPool2()
 {
     /*
     在析构函数中，先对任务队列中加锁，将停止标记设置为true，这样后续即使有新的插入任务操作也会执行失败
     */
     {
-        std::unique_lock<std::mutex> lock(queue_mutex); // 该{}内，queue_mutex处于锁状态
+        std::unique_lock<std::shared_mutex> lock(queue_mutex); // 该{}内，queue_mutex处于锁状态
         stop = true;
     }
     /*使用条件变量唤醒所有线程，所有线程都会往下执行*/
@@ -152,96 +160,70 @@ inline ThreadPool::~ThreadPool()
 
 /*Example:
 
+it seems that ThreadPool is faster than ThreadPool2 on Linux: 0.002s vs 0.003s,
+but is slower than ThreadPool2 on Windows: 0.005s vs 0.002s,
+for num = 1e3 in the following codes.
+
+-------------------------------
+
 #include <iostream>
 #include <tool_functions/ThreadPool.h>
+#include <tool_functions/ThreadPool2.h>
 using namespace std;
 
-class example_class
-{
-public:
-    int a;
-    double b;
-};
-example_class example_function(example_class x)
-{
-    return x;
+double func(int i) {
+    return i;
 }
 
-void ThreadPool_example()
+void ThreadPool1_2_compare()
 {
-    ThreadPool pool(4);	// 创建一个线程池，池中线程为4
-    std::vector<std::future<example_class>> results; // return typename: example_class; 保存多线程执行结果
-    for (int i = 0; i < 10; ++i)
-    { // 创建10个任务
-        int j = i + 10;
-        results.emplace_back(  // 保存每个异步结果
-            pool.enqueue([j] { // 将每个任务插入到任务队列中，lambda表达式： pass const type value j to thread; [] can be empty
-                example_class a;
-                a.a = j;
-                return example_function(a); // return to results; the return type must be the same with results
-            }));
+    int num = 1e3;
+    {
+        auto begin = std::chrono::high_resolution_clock::now();
+        ThreadPool pool(4); // 创建一个线程池，池中线程为4
+        std::vector<std::future<double>> results;
+        for (int i = 0; i < num; ++i)
+        {
+            results.emplace_back(
+                pool.enqueue([i] {
+                    return func(i);
+                    }));
+        }
+        for (auto&& result : results)
+            result.get();
+        auto end = std::chrono::high_resolution_clock::now();
+        double runningtime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1e9; // s
+        cout << "ThreadPool: " << runningtime << "s" << endl;
     }
-    for (auto &&result : results)			// 一次取出保存在results中的结果
-        std::cout << result.get().a << ' '; // result.get() makes sure this thread has been finished here;
-    results.clear(); // future get value can only be called once. get后results里面的future就不能用了；clear之后results才能被再次使用
-    std::cout << std::endl;
-    // if result.get() is pair<int, string>, then you cannot use result.get().first = result.get().second
+
+    {
+        auto begin = std::chrono::high_resolution_clock::now();
+        ThreadPool2 pool(4); // 创建一个线程池，池中线程为4
+        std::vector<std::future<double>> results;
+        for (int i = 0; i < num; ++i)
+        {
+            results.emplace_back(
+                pool.enqueue([i] {
+                    return func(i);
+                    }));
+        }
+        for (auto&& result : results)
+            result.get();
+        auto end = std::chrono::high_resolution_clock::now();
+        double runningtime = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1e9; // s
+        cout << "ThreadPool2: " << runningtime << "s" << endl;
+    }
+
+
+
 }
 
 int main()
 {
-    ThreadPool_example();
+    ThreadPool1_2_compare();
 }
 
 */
 
 
 
-/*Example: multi_thread write a vector (use std lock mechanism)  
-
-
-#include <iostream>
-#include <tool_functions/ThreadPool.h>
-#include <mutex>
-using namespace std;
-
-int vector_size = 3;
-vector<vector<int>> vectors(vector_size);
-vector<std::mutex> mtx(vector_size); // 保护vectors
-void thread_function(int ID, int value)
-{
-    mtx[ID].lock(); // only one thread can lock mtx[ID] here, until mtx[ID] is unlocked
-    vectors[ID].push_back(value);
-    mtx[ID].unlock();
-}
-void ThreadPool_example()
-{
-    ThreadPool pool(5);	// use 5 threads
-    std::vector<std::future<int>> results; // return typename: xxx
-    for (int i = 0; i < vector_size; ++i)
-    {
-        for (int j = 0; j < 1e1; j++)
-        {
-            results.emplace_back(
-                pool.enqueue([i, j] { // pass const type value j to thread; [] can be empty
-                    thread_function(i, j);
-                    return 1; // return to results; the return type must be the same with results
-                }));
-        }
-    }
-    for (auto &&result : results)
-        result.get(); // all threads finish here
-    for (int i = 0; i < vector_size; ++i)
-    {
-        cout << "vectors[" << i << "].size(): " << vectors[i].size() << endl;
-        for (int x = 0; x < vectors[i].size(); x++)
-        {
-            std::cout << vectors[i][x] << ' ';
-        }
-        std::cout << std::endl;
-    }
-}
-int main(){ThreadPool_example();}
-
-
-*/
