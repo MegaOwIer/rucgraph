@@ -65,15 +65,13 @@ double canonical_query_path_extract_distance_no_reduc(vector<vector<two_hop_labe
 		return distance;
 	}
 	else { // already have the common hub, assume that labels are sorted from small to large
-
+		return canonical_query_path_binary_operations_search_weight(L[source], common_hub_checked.second);
 	}
-
-	
 
 }
 
 double canonical_query_path_extract_distance_st_no_R1 /* we assume that source and terminal are not reduced by 2019R1 here*/
-(vector<vector<two_hop_label_v1>>& L, vector<int>& reduction_measures_2019R2, vector<int>& f_2019R1, int source, int terminal)
+(vector<vector<two_hop_label_v1>>& L, vector<int>& reduction_measures_2019R2, vector<int>& f_2019R1, int source, int terminal, pair<bool, int>& common_hub_checked)
 {
 
 	/* we assume that source and terminal are not reduced by 2019R1*/
@@ -103,7 +101,7 @@ double canonical_query_path_extract_distance_st_no_R1 /* we assume that source a
 				for (auto it2 = t_adj_begin; it2 != t_adj_end; it2++)
 				{
 					if (f_2019R1[it1->first] == it1->first && f_2019R1[it2->first] == it2->first) {
-						double x = graph_hash_of_mixed_weighted_two_hop_v1_extract_distance_no_reduc(L, it1->first, it2->first);
+						double x = canonical_query_path_extract_distance_no_reduc(L, it1->first, it2->first, common_hub_checked);
 						if (x == std::numeric_limits<double>::max() && full_two_hop_labels) { // if not full_two_hop_labels, then we may query a max dis while connected
 							return x;
 						}

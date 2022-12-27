@@ -142,7 +142,7 @@ void graph_hash_of_mixed_weighted_PLL_PSL_v1_check_correctness(graph_hash_of_mix
 void test_PLL_PSL() {
 
 	/*parameters*/
-	int iteration_graph_times = 1e3, iteration_source_times = 10, iteration_terminal_times = 10;
+	int iteration_graph_times = 1e2, iteration_source_times = 10, iteration_terminal_times = 10;
 	int V = 100, E = 500, precision = 1, thread_num = 5;
 	double ec_min = 2, ec_max = 2; // set ec_min=ec_max=1 for testing unweighted PLL_with_non_adj_reduction
 
