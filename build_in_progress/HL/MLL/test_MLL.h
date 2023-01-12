@@ -31,6 +31,8 @@ int main()
 #include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_save_graph_with_weight.h>
 
 
+/*this function somehow cannot run on VS, but is OK on the server; 可能是代码文本问题*/
+
 void test_MLL() {
 
 	/*parameters*/
