@@ -110,7 +110,6 @@ public:
 	int max_degree_MG_enhanced2019R2 = 100;
 	int reduce_V_num_2019R1 = 0, MG_num = 0;
 
-
 	/*running time records*/
 	double time_2019R1 = 0;
 	double time_2019R2_or_enhanced_pre = 0;
