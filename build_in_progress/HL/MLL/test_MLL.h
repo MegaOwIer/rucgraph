@@ -30,77 +30,24 @@ int main()
 #include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_read_graph_with_weight.h>
 #include <graph_hash_of_mixed_weighted/read_save/graph_hash_of_mixed_weighted_save_graph_with_weight.h>
 
-pair<double, double>
-querying_element(graph_hash_of_mixed_weighted_CT_v2_case_info* case_info, int s,
-	int t) {
-
-	auto begin = std::chrono::high_resolution_clock::now();
-	CT_extract_distance(*case_info, s, t);
-	auto end = std::chrono::high_resolution_clock::now();
-	double query_dis_time =
-		std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
-		.count() /
-		1e9; // s
-
-	begin = std::chrono::high_resolution_clock::now();
-	vector<pair<int, int>> path;
-	CT_extract_path(*case_info, s, t, path);
-	end = std::chrono::high_resolution_clock::now();
-	double query_path_time =
-		std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
-		.count() /
-		1e9; // s
-
-	return { query_dis_time, query_path_time };
-}
-
-pair<double, double>
-querying(graph_hash_of_mixed_weighted_CT_v2_case_info& case_info,
-	vector<pair<int, int>>& query_list) {
-
-	double query_dis_avg_time = 0, query_path_avg_time = 0;
-	int query_times = query_list.size();
-
-	ThreadPool pool(5); // thread_num for querying
-	std::vector<std::future<pair<double, double>>>
-		results; // return typename: xxx
-	graph_hash_of_mixed_weighted_CT_v2_case_info* case_info_p = &case_info;
-	for (int i = 0; i < query_times; i++) {
-		int s = query_list[i].first, t = query_list[i].second;
-		results.emplace_back(pool.enqueue(
-			[s, t,
-			case_info_p] { // pass const type value j to thread; [] can be empty
-				return querying_element(case_info_p, s, t);
-			}));
-	}
-	for (auto&& result : results) {
-		pair<double, double> r = result.get();
-		query_dis_avg_time += r.first;
-		query_path_avg_time += r.second;
-	}
-	query_dis_avg_time = query_dis_avg_time / (double)query_times;
-	query_path_avg_time = query_path_avg_time / (double)query_times;
-
-	return { query_dis_avg_time, query_path_avg_time };
-}
 
 void test_MLL() {
 
 	/*parameters*/
 	int use_mll = 1;
-	int iteration_graph_times = 1, iteration_source_times = 100,
+	int iteration_graph_times = 100, iteration_source_times = 100,
 		iteration_terminal_times = 100;
-	int V = 100, E = 150, precision = 1;
+	int V = 1000, E = 1500, precision = 1;
 	double ec_min = 0.1,
 		ec_max = 1; // since ec_min = 0.01, precision should be at least 2!
 					// Otherwise ec may be 0, and causes bugs in CT
 
-	double avg_CT_time = 0, avg_PLL_time = 0, avg_PSL_time = 0;
+	double CT_time = 0, avg_PLL_time = 0, avg_PSL_time = 0;
 	long long int avg_CT_index_bit_size = 0, avg_PLL_index_bit_size = 0,
 		avg_PSL_index_bit_size = 0;
 
-	double avg_CT_MLL_time = 0, avg_MLL_query_time = 0;
-	long long int avg_MLL_index_bit_size = 0;
+	double MLL_time = 0, MLL_query_time = 0;
+	long long int MLL_index_bit_size = 0;
 
 	/*iteration*/
 	std::time_t now = std::time(0);
@@ -141,27 +88,20 @@ void test_MLL() {
 			auto begin = std::chrono::high_resolution_clock::now();
 			CT_rank(instance_graph, V + 1, case_info);
 			auto end = std::chrono::high_resolution_clock::now();
-			double runningtime =
+			CT_time =
 				std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin)
 				.count() /
 				1e9; // s
-			avg_CT_time = avg_CT_time + runningtime / iteration_graph_times;
-			avg_CT_index_bit_size =
-				avg_CT_index_bit_size +
-				case_info.compute_label_bit_size() / iteration_graph_times;
-
+			avg_CT_index_bit_size = case_info.compute_label_bit_size();
 			if (use_mll) {
 				auto begin2 = std::chrono::high_resolution_clock::now();
 				ct_mll_index_construction(instance_graph, V + 1, case_info);
 				auto end2 = std::chrono::high_resolution_clock::now();
-				double runningtime2 =
+				MLL_time =
 					std::chrono::duration_cast<std::chrono::nanoseconds>(end2 - begin2)
 					.count() /
 					1e9; // s
-				avg_CT_MLL_time = avg_CT_MLL_time + runningtime2;
-				avg_MLL_index_bit_size =
-					avg_MLL_index_bit_size +
-					compute_mll_label_bit_size() / iteration_graph_times;
+				MLL_index_bit_size = compute_mll_label_bit_size();
 			}
 		}
 
@@ -175,18 +115,6 @@ void test_MLL() {
 			case_info.two_hop_case_info.print_L();
 			case_info.print_root();
 			case_info.print_isIntree();
-		}
-
-		if (0) {
-			vector<pair<int, int>> query_list;
-			boost::random::uniform_int_distribution<> dist{ static_cast<int>(0),
-														   static_cast<int>(V - 1) };
-			for (int i = 0; i < 1e3; i++) {
-				int source = dist(gen);
-				int terminal = dist(gen);
-				query_list.push_back({ source, terminal });
-			}
-			querying(case_info, query_list);
 		}
 
 		boost::random::uniform_int_distribution<> dist{ static_cast<int>(0),
@@ -250,8 +178,8 @@ void test_MLL() {
 							begin3)
 						.count() /
 						1e9;
-					avg_MLL_query_time =
-						avg_MLL_query_time + runningtime3 / iteration_query_times;
+					MLL_query_time =
+						MLL_query_time + runningtime3 / iteration_query_times;
 				}
 				else {
 					CT_extract_path(case_info, source, terminal, path);
@@ -358,15 +286,17 @@ void test_MLL() {
 		}
 
 		if (use_mll) {
-			cout << "avg_CT_MLL_time: " << avg_CT_MLL_time << "s" << endl;
+			cout << "CT_time: " << CT_time << "s" << endl;
+			cout << "MLL_time: " << MLL_time << "s" << endl;
 			print_mll_time();
-			cout << "avg_MLL_query_time: " << avg_MLL_query_time << endl;
-			cout << "avg_MLL_index_bit_size: " << avg_MLL_index_bit_size << endl;
+			cout << "MLL_query_time: " << MLL_query_time << endl;
+			cout << "MLL_index_bit_size: " << MLL_index_bit_size << endl;
+			vector<vector<pair<int, int>>>().swap(MLL);
 		}
 	}
 
 	if (!use_mll) {
-		cout << "avg_CT_time: " << avg_CT_time << "s" << endl;
+		cout << "CT_time: " << CT_time << "s" << endl;
 		cout << "avg_PLL_time: " << avg_PLL_time << "s" << endl;
 		cout << "avg_PSL_time: " << avg_PSL_time << "s" << endl;
 		cout << "avg_CT_index_bit_size: " << avg_CT_index_bit_size << endl;

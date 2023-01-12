@@ -4,7 +4,11 @@
 
 /*global values*/
 vector<vector<pair<int, int>>> MLL; // for mll
-double MLL_time_check_rank_and_monotonicity = 0; double MLL_time_query_dist_in_monotonicity = 0; double MLL_time_update_part = 0; double MLL_time_update_part_1 = 0; double MLL_time_later_update = 0;
+double MLL_time_check_rank_and_monotonicity = 0; 
+double MLL_time_query_dist_in_monotonicity = 0; 
+double MLL_time_update_part = 0; 
+double MLL_time_update_part_1 = 0; 
+double MLL_time_later_update = 0;
 
 void print_mll_time() {
 	cout << "check_rank_and_monotonicity: \t" << MLL_time_check_rank_and_monotonicity << "s" << endl;
@@ -12,6 +16,7 @@ void print_mll_time() {
 	cout << "update_part: \t" << MLL_time_update_part << "s" << endl;
 	cout << "later_update: \t" << MLL_time_later_update << "s" << endl;
 }
+
 long long int compute_mll_label_bit_size()
 {
 	long long int size = 0;
