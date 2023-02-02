@@ -5,16 +5,17 @@
 
 /*
 a directed graph with edge weights, but not node weights
-
-INs.size() == OUTs.size() is the number of vertices, IDs from 0 to n-1
-
-if v1 is in INs of v2, then v2 must be in OUTs of v1, and both records should be associated with the same weight.
 */
 template <typename weight_type> // weight_type may be int, float, double
 class dgraph_v_of_v {
 public:
-	std::vector<std::vector<std::pair<int, weight_type>>> INs; // adj_lists: set of adjacency vertices that can reach v (with arc/edge weights)
-	std::vector<std::vector<std::pair<int, weight_type>>> OUTs; // adj_lists: set of adjacency vertices that can be reached by v (with arc/edge weights)
+	/*
+	INs.size() == OUTs.size() is the number of vertices, IDs from 0 to n-1
+	INs: adj_lists: set of adjacency vertices that can reach v (with arc/edge weights)
+	OUTs: // adj_lists: set of adjacency vertices that can be reached by v (with arc/edge weights)
+	if v1 is in INs of v2, then v2 must be in OUTs of v1, and both records should be associated with the same weight.
+	*/
+	std::vector<std::vector<std::pair<int, weight_type>>> INs, OUTs;
 
 	/*constructors*/
 	dgraph_v_of_v() {}
