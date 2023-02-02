@@ -1,154 +1,145 @@
-/*this is from https://github.com/progschj/ThreadPool 
+/**
+ * This is from https://github.com/progschj/ThreadPool
+ * An explanation: https://www.cnblogs.com/chenleideblog/p/12915534.html
+ */
 
-an explanation: https://www.cnblogs.com/chenleideblog/p/12915534.html
-*/
+#pragma once
 
-
-#ifndef THREAD_POOL_H
-#define THREAD_POOL_H
-
-#include <vector>
-#include <queue>
-#include <memory>
-#include <thread>
-#include <mutex>
 #include <condition_variable>
-#include <future>
 #include <functional>
+#include <future>
+#include <memory>
+#include <mutex>
+#include <queue>
 #include <stdexcept>
+#include <thread>
+#include <vector>
 
 class ThreadPool {
 public:
-    ThreadPool(size_t); // Ïß³Ì³ØµÄ¹¹Ôìº¯Êı
-    template<class F, class... Args>
-    auto enqueue(F&& f, Args&&... args) 
-        -> std::future<typename std::result_of<F(Args...)>::type>; // ½«ÈÎÎñÌí¼Óµ½Ïß³Ì³ØµÄÈÎÎñ¶ÓÁĞÖĞ
-    ~ThreadPool(); // Ïß³Ì³ØµÄÎö¹¹º¯Êı
+    ThreadPool(size_t);  // çº¿ç¨‹æ± çš„æ„é€ å‡½æ•°
+    template <class F, class... Args>
+    auto enqueue(F &&f, Args &&...args) -> std::future<
+        typename std::result_of<F(Args...)>::type>;  // å°†ä»»åŠ¡æ·»åŠ åˆ°çº¿ç¨‹æ± çš„ä»»åŠ¡é˜Ÿåˆ—ä¸­
+    ~ThreadPool();                                   // çº¿ç¨‹æ± çš„ææ„å‡½æ•°
 private:
     // need to keep track of threads so we can join them
-    std::vector< std::thread > workers; // ÓÃÓÚ´æ·ÅÏß³ÌµÄÊı×é£¬ÓÃvectorÈİÆ÷±£´æ
+    std::vector<std::thread> workers;  // ç”¨äºå­˜æ”¾çº¿ç¨‹çš„æ•°ç»„ï¼Œç”¨vectorå®¹å™¨ä¿å­˜
     // the task queue
-    std::queue< std::function<void()> > tasks; // ÓÃÓÚ´æ·ÅÈÎÎñµÄ¶ÓÁĞ£¬ÓÃqueue¶ÓÁĞ½øĞĞ±£´æ¡£ÈÎÎñÀàĞÍÎªstd::function<void()>¡£ÒòÎªstd::functionÊÇÍ¨ÓÃ¶àÌ¬º¯Êı·â×°Æ÷£¬±¾ÖÊÉÏÈÎÎñ¶ÓÁĞÖĞ´æ·ÅµÄÊÇÒ»¸ö¸öº¯Êı
-    
+    std::queue<std::function<void()>>
+        tasks;  // ç”¨äºå­˜æ”¾ä»»åŠ¡çš„é˜Ÿåˆ—ï¼Œç”¨queueé˜Ÿåˆ—è¿›è¡Œä¿å­˜ã€‚ä»»åŠ¡ç±»å‹ä¸ºstd::function<void()>ã€‚å› ä¸ºstd::functionæ˜¯é€šç”¨å¤šæ€å‡½æ•°å°è£…å™¨ï¼Œæœ¬è´¨ä¸Šä»»åŠ¡é˜Ÿåˆ—ä¸­å­˜æ”¾çš„æ˜¯ä¸€ä¸ªä¸ªå‡½æ•°
+
     // synchronization
-    std::mutex queue_mutex; // Ò»¸ö·ÃÎÊÈÎÎñ¶ÓÁĞµÄ»¥³âËø£¬ÔÚ²åÈëÈÎÎñ»òÕßÏß³ÌÈ¡³öÈÎÎñ¶¼ĞèÒª½èÖú»¥³âËø½øĞĞ°²È«·ÃÎÊ
-    std::condition_variable condition; // Ò»¸öÓÃÓÚÍ¨ÖªÏß³ÌÈÎÎñ¶ÓÁĞ×´Ì¬µÄÌõ¼ş±äÁ¿£¬ÈôÓĞÈÎÎñÔòÍ¨ÖªÏß³Ì¿ÉÒÔÖ´ĞĞ£¬·ñÔò½øÈëwait×´Ì¬
-    bool stop; // ±êÊ¶Ïß³Ì³ØµÄ×´Ì¬£¬ÓÃÓÚ¹¹ÔìÓëÎö¹¹ÖĞ¶ÔÏß³Ì³Ø×´Ì¬µÄÁË½â
+    std::mutex
+        queue_mutex;  // ä¸€ä¸ªè®¿é—®ä»»åŠ¡é˜Ÿåˆ—çš„äº’æ–¥é”ï¼Œåœ¨æ’å…¥ä»»åŠ¡æˆ–è€…çº¿ç¨‹å–å‡ºä»»åŠ¡éƒ½éœ€è¦å€ŸåŠ©äº’æ–¥é”è¿›è¡Œå®‰å…¨è®¿é—®
+    std::condition_variable
+        condition;  // ä¸€ä¸ªç”¨äºé€šçŸ¥çº¿ç¨‹ä»»åŠ¡é˜Ÿåˆ—çŠ¶æ€çš„æ¡ä»¶å˜é‡ï¼Œè‹¥æœ‰ä»»åŠ¡åˆ™é€šçŸ¥çº¿ç¨‹å¯ä»¥æ‰§è¡Œï¼Œå¦åˆ™è¿›å…¥waitçŠ¶æ€
+    bool stop;  // æ ‡è¯†çº¿ç¨‹æ± çš„çŠ¶æ€ï¼Œç”¨äºæ„é€ ä¸ææ„ä¸­å¯¹çº¿ç¨‹æ± çŠ¶æ€çš„äº†è§£
 };
- 
+
 // the constructor just launches some amount of workers
-inline ThreadPool::ThreadPool(size_t threads) // ¹¹Ôìº¯Êı¶¨ÒåÎªinline¡£½ÓÊÕ²ÎÊıthreads±íÊ¾Ïß³Ì³ØÖĞÒª´´½¨¶àÉÙ¸öÏß³Ì¡£
-    :   stop(false) // stop³õÊ¼Îªfalse£¬¼´±íÊ¾Ïß³Ì³ØÆô¶¯×Å¡£
+inline ThreadPool::ThreadPool(
+    size_t threads)  // æ„é€ å‡½æ•°å®šä¹‰ä¸ºinlineã€‚æ¥æ”¶å‚æ•°threadsè¡¨ç¤ºçº¿ç¨‹æ± ä¸­è¦åˆ›å»ºå¤šå°‘ä¸ªçº¿ç¨‹ã€‚
+    : stop(false)  // stopåˆå§‹ä¸ºfalseï¼Œå³è¡¨ç¤ºçº¿ç¨‹æ± å¯åŠ¨ç€ã€‚
 {
-    for(size_t i = 0;i<threads;++i) // ½øÈëforÑ­»·£¬ÒÀ´Î´´½¨threads¸öÏß³Ì£¬²¢·ÅÈëÏß³ÌÊı×éworkersÖĞ¡£
-        workers.emplace_back( 
+    for (size_t i = 0; i < threads;
+         ++i)  // è¿›å…¥forå¾ªç¯ï¼Œä¾æ¬¡åˆ›å»ºthreadsä¸ªçº¿ç¨‹ï¼Œå¹¶æ”¾å…¥çº¿ç¨‹æ•°ç»„workersä¸­ã€‚
+        workers.emplace_back(
             /*
-            ÔÚvectorÖĞ£¬emplace_back()³ÉÔ±º¯ÊıµÄ×÷ÓÃÊÇÔÚÈİÆ÷Î²²¿²åÈëÒ»¸ö¶ÔÏó£¬×÷ÓÃĞ§¹ûÓëpush_back()Ò»Ñù£¬µ«ÊÇÁ½ÕßÓĞÂÔÎ¢²îÒì£¬
-            ¼´emplace_back(args)ÖĞ·ÅÈëµÄ¶ÔÏóµÄ²ÎÊı£¬¶øpush_back(OBJ(args))ÖĞ·ÅÈëµÄÊÇ¶ÔÏó¡£¼´emplace_back()Ö±½ÓÔÚÈİÆ÷ÖĞÒÔ´«ÈëµÄ²ÎÊıÖ±½Óµ÷ÓÃ¶ÔÏóµÄ¹¹Ôìº¯Êı¹¹ÔìĞÂµÄ¶ÔÏó£¬
-            ¶øpush_back()ÖĞÏÈµ÷ÓÃ¶ÔÏóµÄ¹¹Ôìº¯Êı¹¹ÔìÒ»¸öÁÙÊ±¶ÔÏó£¬ÔÙ½«ÁÙÊ±¶ÔÏó¿½±´µ½ÈİÆ÷ÄÚ´æÖĞ¡£
-            
-            lambda±í´ïÊ½µÄ¸ñÊ½Îª£º
-            [ ²¶»ñ ] ( ĞÎ²Î ) ËµÃ÷·û(¿ÉÑ¡) Òì³£ËµÃ÷ attr -> ·µ»ØÀàĞÍ { º¯ÊıÌå }
-            ËùÒÔÏÂÊölambda±í´ïÊ½Îª [ ²¶»ñ ] { º¯ÊıÌå } ÀàĞÍ¡£´«ÈëµÄlambda±í´ïÊ½¾ÍÊÇ´´½¨Ïß³ÌµÄÖ´ĞĞº¯Êı.       
+            åœ¨vectorä¸­ï¼Œemplace_back()æˆå‘˜å‡½æ•°çš„ä½œç”¨æ˜¯åœ¨å®¹å™¨å°¾éƒ¨æ’å…¥ä¸€ä¸ªå¯¹è±¡ï¼Œä½œç”¨æ•ˆæœä¸push_back()ä¸€æ ·ï¼Œä½†æ˜¯ä¸¤è€…æœ‰ç•¥å¾®å·®å¼‚ï¼Œ
+            å³emplace_back(args)ä¸­æ”¾å…¥çš„å¯¹è±¡çš„å‚æ•°ï¼Œè€Œpush_back(OBJ(args))ä¸­æ”¾å…¥çš„æ˜¯å¯¹è±¡ã€‚å³emplace_back()ç›´æ¥åœ¨å®¹å™¨ä¸­ä»¥ä¼ å…¥çš„å‚æ•°ç›´æ¥è°ƒç”¨å¯¹è±¡çš„æ„é€ å‡½æ•°æ„é€ æ–°çš„å¯¹è±¡ï¼Œ
+            è€Œpush_back()ä¸­å…ˆè°ƒç”¨å¯¹è±¡çš„æ„é€ å‡½æ•°æ„é€ ä¸€ä¸ªä¸´æ—¶å¯¹è±¡ï¼Œå†å°†ä¸´æ—¶å¯¹è±¡æ‹·è´åˆ°å®¹å™¨å†…å­˜ä¸­ã€‚
+
+            lambdaè¡¨è¾¾å¼çš„æ ¼å¼ä¸ºï¼š
+            [ æ•è· ] ( å½¢å‚ ) è¯´æ˜ç¬¦(å¯é€‰) å¼‚å¸¸è¯´æ˜ attr -> è¿”å›ç±»å‹ { å‡½æ•°ä½“ }
+            æ‰€ä»¥ä¸‹è¿°lambdaè¡¨è¾¾å¼ä¸º [ æ•è· ] { å‡½æ•°ä½“ }
+            ç±»å‹ã€‚ä¼ å…¥çš„lambdaè¡¨è¾¾å¼å°±æ˜¯åˆ›å»ºçº¿ç¨‹çš„æ‰§è¡Œå‡½æ•°.
             */
-            [this] // ¸Ãlambda±í´ïÊ½²¶»ñÏß³Ì³ØÖ¸ÕëthisÓÃÓÚÔÚº¯ÊıÌåÖĞÊ¹ÓÃ£¨µ÷ÓÃÏß³Ì³Ø³ÉÔ±±äÁ¿stop¡¢tasksµÈ£©    
-            {
-                for(;;) // for(;;)ÎªÒ»¸öËÀÑ­»·£¬±íÊ¾Ã¿¸öÏß³Ì¶¼»á·´¸´ÕâÑùÖ´ĞĞ£¬ÕâÆäÊµÃ¿¸öÏß³Ì³ØÖĞµÄÏß³Ì¶¼»áÕâÑù¡£
-                {
-                    std::function<void()> task; // ÔÚÑ­»·ÖĞ£¬ÏÈ´´½¨Ò»¸ö·â×°void()º¯ÊıµÄstd::function¶ÔÏótask£¬ÓÃÓÚ½ÓÊÕºóĞø´ÓÈÎÎñ¶ÓÁĞÖĞµ¯³öµÄÕæÊµÈÎÎñ¡£
+            // è¯¥lambdaè¡¨è¾¾å¼æ•è·çº¿ç¨‹æ± æŒ‡é’ˆthisç”¨äºåœ¨å‡½æ•°ä½“ä¸­ä½¿ç”¨ï¼ˆè°ƒç”¨çº¿ç¨‹æ± æˆå‘˜å˜é‡stopã€tasksç­‰ï¼‰
+            [this] {
+                for (;;) {
+                    std::function<void()> task;
 
                     {
-                        std::unique_lock<std::mutex> lock(this->queue_mutex); // ¸Ã{}ÄÚ£¬queue_mutex´¦ÓÚËø×´Ì¬
+                        // è¯¥{}å†…ï¼Œqueue_mutexå¤„äºé”çŠ¶æ€
+                        std::unique_lock<std::mutex> lock(this->queue_mutex);
 
-                        /*¼´Æä±íÊ¾ÈôÏß³Ì³ØÒÑÍ£Ö¹»òÕßÈÎÎñ¶ÓÁĞÖĞ²»Îª¿Õ£¬Ôò²»»á½øÈëµ½wait×´Ì¬¡£
-                          ÓÉÓÚ¸Õ¿ªÊ¼´´½¨Ïß³Ì³Ø£¬Ïß³Ì³Ø±íÊ¾Î´Í£Ö¹£¬ÇÒÈÎÎñ¶ÓÁĞÎª¿Õ£¬ËùÒÔÃ¿¸öÏß³Ì¶¼»á½øÈëµ½wait×´Ì¬¡£
-                          ÈôºóĞøÌõ¼ş±äÁ¿À´ÁËÍ¨Öª£¬Ïß³Ì¾Í»á¼ÌĞøÍùÏÂ½øĞĞ
+                        /*å³å…¶è¡¨ç¤ºè‹¥çº¿ç¨‹æ± å·²åœæ­¢æˆ–è€…ä»»åŠ¡é˜Ÿåˆ—ä¸­ä¸ä¸ºç©ºï¼Œåˆ™ä¸ä¼šè¿›å…¥åˆ°waitçŠ¶æ€ã€‚
+                          ç”±äºåˆšå¼€å§‹åˆ›å»ºçº¿ç¨‹æ± ï¼Œçº¿ç¨‹æ± è¡¨ç¤ºæœªåœæ­¢ï¼Œä¸”ä»»åŠ¡é˜Ÿåˆ—ä¸ºç©ºï¼Œæ‰€ä»¥æ¯ä¸ªçº¿ç¨‹éƒ½ä¼šè¿›å…¥åˆ°waitçŠ¶æ€ã€‚
+                          è‹¥åç»­æ¡ä»¶å˜é‡æ¥äº†é€šçŸ¥ï¼Œçº¿ç¨‹å°±ä¼šç»§ç»­å¾€ä¸‹è¿›è¡Œ
                         */
                         this->condition.wait(lock,
-                            [this]{ return this->stop || !this->tasks.empty(); });
+                                             [this] { return this->stop || !this->tasks.empty(); });
 
-                        /*ÈôÏß³Ì³ØÒÑ¾­Í£Ö¹ÇÒÈÎÎñ¶ÓÁĞÎª¿Õ£¬Ôòreturn£¬¼´ËùÓĞÏß³ÌÌø³öËÀÑ­»·¡¢±»Å×³öÏß³Ì³Ø£»ÔÚ´ËÖ®Ç°£¬Ã¿¸öÏß³ÌÒªÃ´ÔÚwait×´Ì¬£¬ÒªÃ´ÔÚÖ´ĞĞÏÂÃæµÄtask*/
-                        if(this->stop && this->tasks.empty())
-                            return;
+                        /*è‹¥çº¿ç¨‹æ± å·²ç»åœæ­¢ä¸”ä»»åŠ¡é˜Ÿåˆ—ä¸ºç©ºï¼Œåˆ™returnï¼Œå³æ‰€æœ‰çº¿ç¨‹è·³å‡ºæ­»å¾ªç¯ã€è¢«æŠ›å‡ºçº¿ç¨‹æ± ï¼›åœ¨æ­¤ä¹‹å‰ï¼Œæ¯ä¸ªçº¿ç¨‹è¦ä¹ˆåœ¨waitçŠ¶æ€ï¼Œè¦ä¹ˆåœ¨æ‰§è¡Œä¸‹é¢çš„task*/
+                        if (this->stop && this->tasks.empty()) return;
 
                         /*
-                        ½«ÈÎÎñ¶ÓÁĞÖĞµÄµÚÒ»¸öÈÎÎñÓÃtask±ê¼Ç£¬È»ºó½«ÈÎÎñ¶ÓÁĞÖĞ¸ÃÈÎÎñµ¯³ö¡££¨´Ë´¦Ïß³ÌÊµÔÚ»ñµÃÁËÈÎÎñ¶ÓÁĞÖĞµÄ»¥³âËøµÄÇé¿öÏÂ½øĞĞµÄ£¬ÔÚÌõ¼ş±êÁ¿»½ĞÑÏß³Ìºó£¬
-                        Ïß³ÌÔÚwaitÖÜÆÚÄÚµÃµ½ÁËÈÎÎñ¶ÓÁĞµÄ»¥³âËø²Å»á¼ÌĞøÍùÏÂÖ´ĞĞ¡£ËùÒÔ×îÖÕÖ»»áÓĞÒ»¸öÏß³ÌÄÃµ½ÈÎÎñ£¬²»»á·¢Éú¾ªÈºĞ§Ó¦£©
-                        ÔÚÍË³öÁË{ }£¬ÎÒÃÇ¶ÓÈÎÎñ¶ÓÁĞµÄËù¼ÓµÄËøÒ²ÊÍ·ÅÁË£¬È»ºóÎÒÃÇµÄÏß³Ì¾Í¿ÉÒÔÖ´ĞĞÎÒÃÇÄÃµ½µÄÈÎÎñtaskÁË£¬Ö´ĞĞÍê±ÏÖ®ºó£¬Ïß³ÌÓÖ½øÈëÁËËÀÑ­»·¡£
+                        å°†ä»»åŠ¡é˜Ÿåˆ—ä¸­çš„ç¬¬ä¸€ä¸ªä»»åŠ¡ç”¨taskæ ‡è®°ï¼Œç„¶åå°†ä»»åŠ¡é˜Ÿåˆ—ä¸­è¯¥ä»»åŠ¡å¼¹å‡ºã€‚ï¼ˆæ­¤å¤„çº¿ç¨‹å®åœ¨è·å¾—äº†ä»»åŠ¡é˜Ÿåˆ—ä¸­çš„äº’æ–¥é”çš„æƒ…å†µä¸‹è¿›è¡Œçš„ï¼Œåœ¨æ¡ä»¶æ ‡é‡å”¤é†’çº¿ç¨‹åï¼Œ
+                        çº¿ç¨‹åœ¨waitå‘¨æœŸå†…å¾—åˆ°äº†ä»»åŠ¡é˜Ÿåˆ—çš„äº’æ–¥é”æ‰ä¼šç»§ç»­å¾€ä¸‹æ‰§è¡Œã€‚æ‰€ä»¥æœ€ç»ˆåªä¼šæœ‰ä¸€ä¸ªçº¿ç¨‹æ‹¿åˆ°ä»»åŠ¡ï¼Œä¸ä¼šå‘ç”ŸæƒŠç¾¤æ•ˆåº”ï¼‰
+                        åœ¨é€€å‡ºäº†{
+                        }ï¼Œæˆ‘ä»¬é˜Ÿä»»åŠ¡é˜Ÿåˆ—çš„æ‰€åŠ çš„é”ä¹Ÿé‡Šæ”¾äº†ï¼Œç„¶åæˆ‘ä»¬çš„çº¿ç¨‹å°±å¯ä»¥æ‰§è¡Œæˆ‘ä»¬æ‹¿åˆ°çš„ä»»åŠ¡taskäº†ï¼Œæ‰§è¡Œå®Œæ¯•ä¹‹åï¼Œçº¿ç¨‹åˆè¿›å…¥äº†æ­»å¾ªç¯ã€‚
                         */
                         task = std::move(this->tasks.front());
-                        this->tasks.pop(); // task²»»á¶Ñ»ıÔÚqueueÖĞ
+                        this->tasks.pop();  // taskä¸ä¼šå †ç§¯åœ¨queueä¸­
                     }
 
                     task();
                 }
-            }
-        );
+            });
 }
 
 // add new work item to the pool
 /*
-equeueÊÇÒ»¸öÄ£°åº¯Êı£¬ÆäÀàĞÍĞÎ²ÎÎªFÓëArgs¡£ÆäÖĞclass... Args±íÊ¾¶à¸öÀàĞÍĞÎ²Î¡£
-autoÓÃÓÚ×Ô¶¯ÍÆµ¼³öequeueµÄ·µ»ØÀàĞÍ£¬º¯ÊıµÄĞÎ²ÎÎª(F&& f, Args&&... args)£¬ÆäÖĞ&&±íÊ¾ÓÒÖµÒıÓÃ¡£±íÊ¾½ÓÊÜÒ»¸öFÀàĞÍµÄf£¬ÓëÈô¸É¸öArgsÀàĞÍµÄargs¡£
+equeueæ˜¯ä¸€ä¸ªæ¨¡æ¿å‡½æ•°ï¼Œå…¶ç±»å‹å½¢å‚ä¸ºFä¸Argsã€‚å…¶ä¸­class... Argsè¡¨ç¤ºå¤šä¸ªç±»å‹å½¢å‚ã€‚
+autoç”¨äºè‡ªåŠ¨æ¨å¯¼å‡ºequeueçš„è¿”å›ç±»å‹ï¼Œå‡½æ•°çš„å½¢å‚ä¸º(F&& f, Args&&...
+args)ï¼Œå…¶ä¸­&&è¡¨ç¤ºå³å€¼å¼•ç”¨ã€‚è¡¨ç¤ºæ¥å—ä¸€ä¸ªFç±»å‹çš„fï¼Œä¸è‹¥å¹²ä¸ªArgsç±»å‹çš„argsã€‚
 
-typename std::result_of<F(Args...)>::type   //»ñµÃÒÔArgsÎª²ÎÊıµÄFµÄº¯ÊıÀàĞÍµÄ·µ»ØÀàĞÍ
-std::future<typename std::result_of<F(Args...)>::type> //std::futureÓÃÀ´·ÃÎÊÒì²½²Ù×÷µÄ½á¹û
-×îÖÕ·µ»ØµÄÊÇ·ÅÔÚstd::futureÖĞµÄF(Args¡­)·µ»ØÀàĞÍµÄÒì²½Ö´ĞĞ½á¹û¡£
+typename std::result_of<F(Args...)>::type   //è·å¾—ä»¥Argsä¸ºå‚æ•°çš„Fçš„å‡½æ•°ç±»å‹çš„è¿”å›ç±»å‹
+std::future<typename std::result_of<F(Args...)>::type> //std::futureç”¨æ¥è®¿é—®å¼‚æ­¥æ“ä½œçš„ç»“æœ
+æœ€ç»ˆè¿”å›çš„æ˜¯æ”¾åœ¨std::futureä¸­çš„F(Argsâ€¦)è¿”å›ç±»å‹çš„å¼‚æ­¥æ‰§è¡Œç»“æœã€‚
 */
-template<class F, class... Args>
-auto ThreadPool::enqueue(F&& f, Args&&... args) 
-    -> std::future<typename std::result_of<F(Args...)>::type> // ±íÊ¾·µ»ØÀàĞÍ£¬Óëlambda±í´ïÊ½ÖĞµÄ±íÊ¾·½·¨Ò»Ñù¡£
+template <class F, class... Args>
+auto ThreadPool::enqueue(F &&f, Args &&...args) -> std::future<
+    typename std::result_of<F(Args...)>::type>  // è¡¨ç¤ºè¿”å›ç±»å‹ï¼Œä¸lambdaè¡¨è¾¾å¼ä¸­çš„è¡¨ç¤ºæ–¹æ³•ä¸€æ ·ã€‚
 {
-    using return_type = typename std::result_of<F(Args...)>::type; // »ñµÃÒÔArgsÎª²ÎÊıµÄFµÄº¯ÊıÀàĞÍµÄ·µ»ØÀàĞÍ
+    using return_type =
+        typename std::result_of<F(Args...)>::type;  // è·å¾—ä»¥Argsä¸ºå‚æ•°çš„Fçš„å‡½æ•°ç±»å‹çš„è¿”å›ç±»å‹
 
-    auto task = std::make_shared< std::packaged_task<return_type()> >(
-            std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-        );
-        
-    std::future<return_type> res = task->get_future(); // resÖĞ±£´æÁËÀàĞÍÎªreturn_typeµÄ±äÁ¿£¬ÓĞtaskÒì²½Ö´ĞĞÍê±Ï²Å¿ÉÒÔ½«Öµ±£´æ½øÈ¥
+    auto task = std::make_shared<std::packaged_task<return_type()>>(
+        std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+
+    std::future<return_type> res =
+        task->get_future();  // resä¸­ä¿å­˜äº†ç±»å‹ä¸ºreturn_typeçš„å˜é‡ï¼Œæœ‰taskå¼‚æ­¥æ‰§è¡Œå®Œæ¯•æ‰å¯ä»¥å°†å€¼ä¿å­˜è¿›å»
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
 
         // don't allow enqueueing after stopping the pool
-        if(stop)
-            throw std::runtime_error("enqueue on stopped ThreadPool");
+        if (stop) throw std::runtime_error("enqueue on stopped ThreadPool");
 
-        tasks.emplace([task](){ (*task)(); });
+        tasks.emplace([task]() { (*task)(); });
     }
-    condition.notify_one(); // //ÈÎÎñ¼ÓÈëÈÎÎñ¶ÓÁĞºó£¬ĞèÒªÈ¥»½ĞÑÒ»¸öÏß³Ì
-    return res; // //´ıÏß³ÌÖ´ĞĞÍê±Ï£¬½«Ö´ĞĞµÄ½á¹û·µ»Ø
+    condition.notify_one();  // //ä»»åŠ¡åŠ å…¥ä»»åŠ¡é˜Ÿåˆ—åï¼Œéœ€è¦å»å”¤é†’ä¸€ä¸ªçº¿ç¨‹
+    return res;              // //å¾…çº¿ç¨‹æ‰§è¡Œå®Œæ¯•ï¼Œå°†æ‰§è¡Œçš„ç»“æœè¿”å›
 }
 
 // the destructor joins all threads
-inline ThreadPool::~ThreadPool()
-{
+inline ThreadPool::~ThreadPool() {
     /*
-    ÔÚÎö¹¹º¯ÊıÖĞ£¬ÏÈ¶ÔÈÎÎñ¶ÓÁĞÖĞ¼ÓËø£¬½«Í£Ö¹±ê¼ÇÉèÖÃÎªtrue£¬ÕâÑùºóĞø¼´Ê¹ÓĞĞÂµÄ²åÈëÈÎÎñ²Ù×÷Ò²»áÖ´ĞĞÊ§°Ü
+    åœ¨ææ„å‡½æ•°ä¸­ï¼Œå…ˆå¯¹ä»»åŠ¡é˜Ÿåˆ—ä¸­åŠ é”ï¼Œå°†åœæ­¢æ ‡è®°è®¾ç½®ä¸ºtrueï¼Œè¿™æ ·åç»­å³ä½¿æœ‰æ–°çš„æ’å…¥ä»»åŠ¡æ“ä½œä¹Ÿä¼šæ‰§è¡Œå¤±è´¥
     */
     {
-        std::unique_lock<std::mutex> lock(queue_mutex); // ¸Ã{}ÄÚ£¬queue_mutex´¦ÓÚËø×´Ì¬
+        std::unique_lock<std::mutex> lock(queue_mutex);  // è¯¥{}å†…ï¼Œqueue_mutexå¤„äºé”çŠ¶æ€
         stop = true;
     }
-    /*Ê¹ÓÃÌõ¼ş±äÁ¿»½ĞÑËùÓĞÏß³Ì£¬ËùÓĞÏß³Ì¶¼»áÍùÏÂÖ´ĞĞ*/
+    /*ä½¿ç”¨æ¡ä»¶å˜é‡å”¤é†’æ‰€æœ‰çº¿ç¨‹ï¼Œæ‰€æœ‰çº¿ç¨‹éƒ½ä¼šå¾€ä¸‹æ‰§è¡Œ*/
     condition.notify_all();
 
-    /*ÔÚstopÉèÖÃÎªtrueÇÒÈÎÎñ¶ÓÁĞÖĞÎª¿ÕÊ±£¬¶ÔÓ¦µÄÏß³Ì½ø¶øÌø³öÑ­»·½áÊø
-    ½«Ã¿¸öÏß³ÌÉèÖÃÎªjoin£¬µÈµ½Ã¿¸öÏß³Ì½áÊøÍê±Ïºó£¬Ö÷Ïß³ÌÔÙÍË³ö¡£*/
-    for(std::thread &worker: workers)
+    /*åœ¨stopè®¾ç½®ä¸ºtrueä¸”ä»»åŠ¡é˜Ÿåˆ—ä¸­ä¸ºç©ºæ—¶ï¼Œå¯¹åº”çš„çº¿ç¨‹è¿›è€Œè·³å‡ºå¾ªç¯ç»“æŸ
+    å°†æ¯ä¸ªçº¿ç¨‹è®¾ç½®ä¸ºjoinï¼Œç­‰åˆ°æ¯ä¸ªçº¿ç¨‹ç»“æŸå®Œæ¯•åï¼Œä¸»çº¿ç¨‹å†é€€å‡ºã€‚*/
+    for (std::thread &worker : workers)
         worker.join();
 }
-
-#endif
-
-
-
-
-
-
-
-
-
-
 
 /*Example:
 
@@ -169,23 +160,21 @@ example_class example_function(example_class x)
 
 void ThreadPool_example()
 {
-    ThreadPool pool(4);	// ´´½¨Ò»¸öÏß³Ì³Ø£¬³ØÖĞÏß³ÌÎª4
-    std::vector<std::future<example_class>> results; // return typename: example_class; ±£´æ¶àÏß³ÌÖ´ĞĞ½á¹û
-    for (int i = 0; i < 10; ++i)
-    { // ´´½¨10¸öÈÎÎñ
-        int j = i + 10;
-        results.emplace_back(  // ±£´æÃ¿¸öÒì²½½á¹û
-            pool.enqueue([j] { // ½«Ã¿¸öÈÎÎñ²åÈëµ½ÈÎÎñ¶ÓÁĞÖĞ£¬lambda±í´ïÊ½£º pass const type value j to thread; [] can be empty
-                example_class a;
-                a.a = j;
-                return example_function(a); // return to results; the return type must be the same with results
+    ThreadPool pool(4);	// åˆ›å»ºä¸€ä¸ªçº¿ç¨‹æ± ï¼Œæ± ä¸­çº¿ç¨‹ä¸º4
+    std::vector<std::future<example_class>> results; // return typename: example_class;
+ä¿å­˜å¤šçº¿ç¨‹æ‰§è¡Œç»“æœ for (int i = 0; i < 10; ++i) { // åˆ›å»º10ä¸ªä»»åŠ¡ int j = i + 10;
+        results.emplace_back(  // ä¿å­˜æ¯ä¸ªå¼‚æ­¥ç»“æœ
+            pool.enqueue([j] { // å°†æ¯ä¸ªä»»åŠ¡æ’å…¥åˆ°ä»»åŠ¡é˜Ÿåˆ—ä¸­ï¼Œlambdaè¡¨è¾¾å¼ï¼š pass const type value j
+to thread; [] can be empty example_class a; a.a = j; return example_function(a); // return to
+results; the return type must be the same with results
             }));
     }
-    for (auto &&result : results)			// Ò»´ÎÈ¡³ö±£´æÔÚresultsÖĞµÄ½á¹û
-        std::cout << result.get().a << ' '; // result.get() makes sure this thread has been finished here;
-    results.clear(); // future get value can only be called once. getºóresultsÀïÃæµÄfuture¾Í²»ÄÜÓÃÁË£»clearÖ®ºóresults²ÅÄÜ±»ÔÙ´ÎÊ¹ÓÃ
-    std::cout << std::endl;
-    // if result.get() is pair<int, string>, then you cannot use result.get().first = result.get().second
+    for (auto &&result : results)			// ä¸€æ¬¡å–å‡ºä¿å­˜åœ¨resultsä¸­çš„ç»“æœ
+        std::cout << result.get().a << ' '; // result.get() makes sure this thread has been finished
+here; results.clear(); // future get value can only be called once.
+getåresultsé‡Œé¢çš„futureå°±ä¸èƒ½ç”¨äº†ï¼›clearä¹‹åresultsæ‰èƒ½è¢«å†æ¬¡ä½¿ç”¨ std::cout << std::endl;
+    // if result.get() is pair<int, string>, then you cannot use result.get().first =
+result.get().second
 }
 
 int main()
@@ -195,19 +184,17 @@ int main()
 
 */
 
-
-
-/*Example: multi_thread write a vector (use std lock mechanism)  
+/*Example: multi_thread write a vector (use std lock mechanism)
 
 
 #include <iostream>
-#include <tool_functions/ThreadPool.h>
 #include <mutex>
+#include <tool_functions/ThreadPool.h>
 using namespace std;
 
 int vector_size = 3;
 vector<vector<int>> vectors(vector_size);
-vector<std::mutex> mtx(vector_size); // ±£»¤vectors
+vector<std::mutex> mtx(vector_size); // ä¿æŠ¤vectors
 void thread_function(int ID, int value)
 {
     mtx[ID].lock(); // only one thread can lock mtx[ID] here, until mtx[ID] is unlocked
