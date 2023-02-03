@@ -12,7 +12,7 @@ using namespace std;
 // header files in the Boost library: https://www.boost.org/
 #include <boost/random.hpp>
 boost::random::mt19937 boost_random_time_seed{ static_cast<std::uint32_t>(std::time(0)) };
-#include <graph_hash_of_mixed_weighted/HL/two_hop_v2/test_CT_v2.h>
+#include <build_in_progress/HL/two_hop_v2/test_CT_v2.h>
 
 int main()
 {

@@ -3,35 +3,26 @@
 #include<iostream>
 #include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_binary_operations.h>
 
-
 /*
-the paired adjacency lists of node v;
-
-if v1 is in INs of v2, then v2 must be in OUTs of v1, and both records should be associated with the same weight.
+a directed graph with edge weights, but not node weights
 */
 template <typename weight_type> // weight_type may be int, float, double
-class dgraph_v_of_v_adjs {
-public:
-	std::vector<std::pair<int, weight_type>> INs; // set of adjacency vertices that can reach v (with arc/edge weights)
-	std::vector<std::pair<int, weight_type>> OUTs; // set of adjacency vertices that can be reached by v (with arc/edge weights)
-};
-
-
-/*a directed graph with edge weights, but not node weights*/
-template <typename weight_type>
 class dgraph_v_of_v {
 public:
-	std::vector<dgraph_v_of_v_adjs<weight_type>> adj_lists; // adj_lists.size()==n is the number of vertices, IDs from 0 to n-1
+	/*
+	INs.size() == OUTs.size() is the number of vertices, IDs from 0 to n-1
+	INs: adj_lists: set of adjacency vertices that can reach v (with arc/edge weights)
+	OUTs: // adj_lists: set of adjacency vertices that can be reached by v (with arc/edge weights)
+	if v1 is in INs of v2, then v2 must be in OUTs of v1, and both records should be associated with the same weight.
+	*/
+	std::vector<std::vector<std::pair<int, weight_type>>> INs, OUTs;
 
 	/*constructors*/
-
 	dgraph_v_of_v() {}
-
 	dgraph_v_of_v(int n) {
-		adj_lists.resize(n); // initialize n vertices
+		INs.resize(n); // initialize n vertices
+		OUTs.resize(n);
 	}
-
-
 
 
 	/*class member functions*/
@@ -57,8 +48,8 @@ void dgraph_v_of_v<weight_type>::add_edge(int v1, int v2, weight_type weight) {
 	this function can change edge weights;
 	*/
 
-	graph_hash_of_mixed_weighted_binary_operations_insert(adj_lists[v1].OUTs, v2, weight);
-	graph_hash_of_mixed_weighted_binary_operations_insert(adj_lists[v2].INs, v1, weight);
+	graph_hash_of_mixed_weighted_binary_operations_insert(OUTs[v1], v2, weight);
+	graph_hash_of_mixed_weighted_binary_operations_insert(INs[v2], v1, weight);
 }
 
 
@@ -67,8 +58,8 @@ void dgraph_v_of_v<weight_type>::remove_edge(int v1, int v2) {
 
 	/*edge direction: v1 to v2*/
 
-	graph_hash_of_mixed_weighted_binary_operations_erase(adj_lists[v1].OUTs, v2);
-	graph_hash_of_mixed_weighted_binary_operations_erase(adj_lists[v2].INs, v1);
+	graph_hash_of_mixed_weighted_binary_operations_erase(OUTs[v1], v2);
+	graph_hash_of_mixed_weighted_binary_operations_erase(INs[v2], v1);
 }
 
 template <typename weight_type>
@@ -76,7 +67,7 @@ weight_type dgraph_v_of_v<weight_type>::edge_weight(int v1, int v2) {
 
 	/*edge direction: v1 to v2*/
 
-	return graph_hash_of_mixed_weighted_binary_operations_search_weight(adj_lists[v1].OUTs, v2);
+	return graph_hash_of_mixed_weighted_binary_operations_search_weight(OUTs[v1], v2);
 }
 
 
@@ -85,8 +76,8 @@ bool dgraph_v_of_v<weight_type>::contain_edge(int v1, int v2) {
 
 	/*this function checks two conditions: v1 is in INs of v2; v2 is in OUTs of v1*/
 
-	int x = graph_hash_of_mixed_weighted_binary_operations_search(adj_lists[v1].OUTs, v2) +
-		graph_hash_of_mixed_weighted_binary_operations_search(adj_lists[v2].INs, v1);
+	int x = graph_hash_of_mixed_weighted_binary_operations_search(OUTs[v1], v2) +
+		graph_hash_of_mixed_weighted_binary_operations_search(INs[v2], v1);
 
 	if (x == 0) {
 		return false;
@@ -96,13 +87,13 @@ bool dgraph_v_of_v<weight_type>::contain_edge(int v1, int v2) {
 	}
 	else {
 		std::cout << "dgraph_v_of_v check_edge error!" << std::endl;
-		if (graph_hash_of_mixed_weighted_binary_operations_search(adj_lists[v1].OUTs, v2)) {
+		if (graph_hash_of_mixed_weighted_binary_operations_search(OUTs[v1], v2)) {
 			std::cout << v2 << " is in OUTs of" << v1 << std::endl;
 		}
 		else {
 			std::cout << v2 << " is NOT in OUTs of" << v1 << std::endl;
 		}
-		if (graph_hash_of_mixed_weighted_binary_operations_search(adj_lists[v2].INs, v1)) {
+		if (graph_hash_of_mixed_weighted_binary_operations_search(INs[v2], v1)) {
 			std::cout << v1 << " is in INs of" << v2 << std::endl;
 		}
 		else {
@@ -118,8 +109,8 @@ long long int dgraph_v_of_v<weight_type>::edge_number() {
 
 	/*only check INs*/
 	long long int num = 0;
-	for (int i = adj_lists.size() - 1; i >= 0; i--) {
-		num += adj_lists[i].INs.size();
+	for (int i = INs.size() - 1; i >= 0; i--) {
+		num += INs[i].size();
 	}
 
 	return num;
@@ -156,7 +147,7 @@ void example_dgraph_v_of_v() {
 	std::cout << g.contain_edge(1, 5) << std::endl;
 	std::cout << g.contain_edge(5, 1) << std::endl;
 	std::cout << g.edge_number() << std::endl;
-	std::cout << g.adj_lists.size() << std::endl;
+	std::cout << g.INs.size() << std::endl;
 	
 
 }

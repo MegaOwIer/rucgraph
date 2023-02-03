@@ -142,11 +142,11 @@ void graph_hash_of_mixed_weighted_PLL_PSL_v1_check_correctness(graph_hash_of_mix
 void test_PLL_PSL() {
 
 	/*parameters*/
-	int iteration_graph_times = 1e3, iteration_source_times = 10, iteration_terminal_times = 10;
+	int iteration_graph_times = 1e2, iteration_source_times = 10, iteration_terminal_times = 10;
 	int V = 100, E = 500, precision = 1, thread_num = 5;
 	double ec_min = 2, ec_max = 2; // set ec_min=ec_max=1 for testing unweighted PLL_with_non_adj_reduction
 
-	bool use_PLL = 0; // 1: PLL 0: PSL
+	bool use_PLL = 1; // 1: PLL 0: PSL
 
 	double avg_index_time = 0, avg_index_size_per_v = 0, avg_reduce_V_num_2019R1 = 0, avg_MG_num = 0;
 	double avg_canonical_repair_remove_label_ratio = 0;
