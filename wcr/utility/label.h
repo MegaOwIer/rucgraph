@@ -9,12 +9,19 @@
 
 #pragma once
 
+#include <iostream>
+
 template <class weight_t>
 struct label {
-    int vertex, prev;
+    size_t vertex, prev;
     weight_t dist;
 
-    label(int _v, weight_t _w, int _prev) : vertex(_v), prev(_prev), dist(_w) {}
+    label(size_t _v, weight_t _w, size_t _prev) : vertex(_v), prev(_prev), dist(_w) {}
 
-    bool operator< (const label &u) { return vertex < u.vertex; }
+    bool operator<(const label &u) { return vertex < u.vertex; }
 };
+
+template <class weight_t>
+std::ostream &operator<<(std::ostream &os, const label<weight_t> &cur) {
+    return os << "(" << cur.vertex << ", " << cur.dist << ", " << cur.prev << ")";
+}

@@ -13,12 +13,12 @@
 
 struct PSL_runtime_info {
     /* Running time */
-    double time_initialization = 0;
-    double time_2019R1 = 0;
-    double time_2019R2 = 0;
-    double time_generate_labels = 0;
-    double time_canonical_repair1 = 0;
-    double time_canonical_repair2 = 0;
+    long long time_initialization = 0;
+    long long time_2019R1 = 0;
+    long long time_2019R2 = 0;
+    long long time_generate_labels = 0;
+    // long long time_canonical_repair1 = 0;
+    // long long time_canonical_repair2 = 0;
 
     /* Reduction info */
     bool use_2019R1 = false;  // Equivalence between nodes

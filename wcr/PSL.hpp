@@ -10,14 +10,16 @@
 
 #pragma once
 
-#include "dgraph_v_of_v/dgraph_v_of_v.h"
 #include "tool_functions/ThreadPool.h"
 
-#include "config.h"
+#include "utility/config.h"
+#include "utility/dgraph.hpp"
 #include "utility/label.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
+#include <iostream>
 #include <numeric>
 #include <queue>
 #include <shared_mutex>
@@ -27,60 +29,58 @@
 
 template <class weight_t>
 class PSL {
-    std::vector<int> sorted_vertex;
+    using label_set = std::vector<std::vector<label<weight_t>>>;
+
+    // node ranks
+    std::vector<size_t> sorted_vertex;
     std::vector<size_t> rank;
 
-    std::vector<std::vector<label<weight_t>>> L;
-    std::vector<std::vector<label<weight_t>>> L_temp;
-    std::vector<size_t> endpos1;
+    // results. 0 -> out, 1 -> in
+    label_set L[2], L_temp[2];
+    std::vector<size_t> endpos1[2];
 
+    // for multi-thread
     std::queue<int> thread_id;
     std::shared_mutex mtx;
-    std::vector<std::vector<int>> dirt;
+    std::vector<std::vector<size_t>> dirt;
     std::vector<std::vector<weight_t>> dmin;
 
-    void propagate(const dgraph_v_of_v<weight_t> &g, int u);
+    void propagate(const std::array<dgraph<weight_t>, 2> &G, int k, size_t u);
 
-    void append(int u);
+    void append(int k, size_t u);
 
-    void shrink(int u);
+    void shrink(int k, size_t u);
+
+    void build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, int num_of_threads);
+
+    // for debug
+    void print_label_set(const std::vector<std::vector<label<weight_t>>> &_L);
 
 public:
-    PSL(const dgraph_v_of_v<weight_t> &g, int num_of_threads, PSL_runtime_info &case_info);
+    /**
+     * @brief Building process of PSL algorithm. Implemented according to Algorithm 1 in the paper.
+     *
+     * @tparam weight_t
+     * @param g
+     * @param num_of_threads
+     * @param case_info
+     */
+    PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_info &case_info);
 
-    weight_t query_dist(int u, int v) {}
+    /**
+     * @brief Query length of shortest path from u to v.
+     */
+    weight_t query_dist(size_t u, size_t v);
 };
 
-/**
- * @brief Building process of PSL algorithm. Implemented according to Algorithm 1 in the paper.
- *
- * @tparam weight_t
- * @param g
- * @param num_of_threads
- * @param case_info
- */
 template <class weight_t>
-PSL<weight_t>::PSL(const dgraph_v_of_v<weight_t> &g, int num_of_threads,
-                   PSL_runtime_info &case_info) {
+PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_info &case_info) {
 
-    size_t Vnum = g.getV();
-    std::chrono::_V2::system_clock::time_point begin_time, end_time;
+    decltype(std::chrono::high_resolution_clock::now()) begin_time, end_time;
 
     /* ------- Initialization ------- */
 
     begin_time = std::chrono::high_resolution_clock::now();
-
-    // sort vertices by degrees
-    sorted_vertex.resize(Vnum);
-    std::iota(sorted_vertex.begin(), sorted_vertex.end(), 0);
-    std::stable_sort(sorted_vertex.begin(), sorted_vertex.end(),
-                     [&](int u, int v) { return g[u].size() > g[v].size(); });
-
-    // node rank
-    rank.resize(Vnum);
-    for (size_t i = 0; i < Vnum; i++) {
-        rank[sorted_vertex[i]] = i;
-    }
 
     // std::vector<std::vector<pair<int, double>>>().swap(adjs);
     // adjs.resize(max_N_ID);
@@ -117,7 +117,7 @@ PSL<weight_t>::PSL(const dgraph_v_of_v<weight_t> &g, int num_of_threads,
 
     end_time = std::chrono::high_resolution_clock::now();
     case_info.time_initialization =
-        (double) std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count() / 1e9;
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
 
     /* ------- Reduction ------- */
 
@@ -127,7 +127,7 @@ PSL<weight_t>::PSL(const dgraph_v_of_v<weight_t> &g, int num_of_threads,
 
         // ThreadPool pool(num_of_threads);
         // std::vector<std::future<int>> results;  // return typename: xxx
-        // for (int i = 0; i < Vnum; i++) {
+        // for (int i = 0; i < g.getV(); i++) {
         //     std::vector<int> *xx = &(case_info.reduction_measures_2019R1);
         //     std::vector<int> *yy = &(case_info.f_2019R1);
         //     results.emplace_back(
@@ -239,115 +239,32 @@ PSL<weight_t>::PSL(const dgraph_v_of_v<weight_t> &g, int num_of_threads,
     /* ------- Generate Labels ------- */
     begin_time = std::chrono::high_resolution_clock::now();
 
-    L.resize(Vnum);
-    L_temp.resize(Vnum);
-    endpos1.resize(Vnum);
-
-    // Line 1-2.
-    for (size_t i = 0; i < Vnum; i++) {
-        L[i].emplace_back(i, 0, i);
-    }
-
+    // prepare for thread pool
     dmin.resize(num_of_threads);
     dirt.resize(num_of_threads);
     for (int i = 0; i < num_of_threads; i++) {
-        dmin[i].resize(Vnum);
-        dirt[i].assign(Vnum, -1);
+        dmin[i].resize(g.getV());
+        dirt[i].assign(g.getV(), -1U);
         thread_id.push(i);
     }
-    // if_continue_595 = true;
-    // int if_continue_595_false_time = 0;
 
-    ThreadPool pool(num_of_threads);
-    std::vector<std::future<int>> results;
-    // int num_of_threads_per_push = num_of_threads * 1000;
-    // ÿ��push��ȥ num_of_threads_per_push
-    // �̣߳����û���쳣������push��ȥnum_of_threads_per_push�̣߳����ȫ��һ��push��ȥ����ȫ���̶߳���������catch�쳣
+    // build labels
+    std::array<dgraph<weight_t>, 2> G {dgraph<weight_t>(g), dgraph<weight_t>(g, true)};
+    G[0].sort_nodes();
+    G[1].sort_nodes();
+    build_PSL_labels(G, num_of_threads);
 
-    // since R2 skip some vertices, some new labels can only be
-    // generated when d increases 2, not 1, thus terminate the
-    // loop only when if_continue_595==false twice
-
-    while (true) {
-        // cout << "here" << endl;
-
-        // if (if_continue_595 == true) {
-        //     if_continue_595_false_time = 0;
-        // }
-        // if_continue_595 = false;
-        // int push_num = 0;
-
-        // Line 4-20
-        for (size_t u = 0; u < Vnum; u++) {
-            // if (ideal_graph_595[u].size() == 0 ||
-            //     case_info.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
-            //     continue;  // do not search isolated vertices
-            // auto *xx = &case_info;
-
-            // new labels add into L_temp[u], but also read L in the process
-            results.emplace_back(pool.enqueue([u, this, &g] {
-                this->propagate(g, (int)u);
-                return 1;
-            }));
-            // push_num++;
-            // if (push_num % num_of_threads_per_push == 0) {
-            //     for (auto &&result : results)
-            //         result.get();  // all threads finish here
-            //     results.clear();
-            // }
-        }
-
-        for (auto &&result : results)
-            result.get();
-        results.clear();
-
-        for (size_t u = 0; u < Vnum; u++) {
-            // if (ideal_graph_595[u].size() == 0 ||
-            //     case_info.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
-            //     continue;                            // do not search isolated vertices
-
-            // new labels in L_temp[u] add into L[u], to avoid locking L in propagate process
-            results.emplace_back(pool.enqueue([u, this] {
-                this->append((int)u);
-                return 1;
-            }));
-        }
-
-        for (auto &&result : results)
-            result.get();
-        results.clear();  // 如果本轮没有异常则继续
-
-        bool is_empty = true;
-        for (size_t u = 0; u < Vnum; u++) {
-            if (!L_temp[u].empty()) {
-                is_empty = false;
-            }
-            endpos1[u] = L[u].size() - L_temp[u].size();
-            L_temp[u].clear();
-        }
-        if (is_empty) {
-            break;
-        }
-        // if (if_continue_595 == false) {
-        //     if_continue_595_false_time++;  // if if_continue_595_false_time==2, then
-        //                                    // if_continue_595==false twice
-        // }
-    }
-
-    // remove redundant labels in L
-    for (size_t u = 0; u < Vnum; u++) {
-        results.emplace_back(pool.enqueue([u, this] {
-            this->shrink((int)u);
-            return 1;
-        }));
-    }
-    for (auto &&result : results)
-        result.get();
-    results.clear();
+    // free heaps
+    L_temp[0].clear();
+    L_temp[1].clear();
+    endpos1[0].clear();
+    endpos1[1].clear();
+    dirt.clear();
+    dmin.clear();
 
     end_time = std::chrono::high_resolution_clock::now();
     case_info.time_generate_labels =
-        (double)std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count() / 1e9;
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
     //---------------------------------------------------------------------------------------------------------------------------------------
 
     //----------------------------------------------- step 4: canonical_repair
@@ -432,21 +349,37 @@ PSL<weight_t>::PSL(const dgraph_v_of_v<weight_t> &g, int num_of_threads,
     //---------------------------------------------------------------------------------------------------------------------------------------
 
     // graph_hash_of_mixed_weighted_two_hop_clear_global_values();
-    puts("ok");
 }
 
 template <class weight_t>
-void PSL<weight_t>::propagate(const dgraph_v_of_v<weight_t> &g, int u) {
+weight_t PSL<weight_t>::query_dist(size_t u, size_t v) {
+    auto i = L[0][u].begin(), j = L[1][v].begin();
+    weight_t ans = std::numeric_limits<weight_t>::max();
+    while (i < L[0][u].end() && j < L[1][v].end()) {
+        if (i->vertex < j->vertex) {
+            i++;
+        } else if (i->vertex > j->vertex) {
+            j++;
+        } else {
+            ans = std::min(ans, i->dist + j->dist);
+            i++, j++;
+        }
+    }
+    return ans;
+}
+
+template <class weight_t>
+void PSL<weight_t>::propagate(const std::array<dgraph<weight_t>, 2> &G, int k, size_t u) {
     mtx.lock();
     int current_tid = thread_id.front();
     thread_id.pop();
     mtx.unlock();
 
     // Line 5
-    for (const label<weight_t> &cur : L[u]) {
-        int v = cur.vertex;
+    for (const label<weight_t> &cur : L[k][u]) {
+        size_t v = cur.vertex;
         weight_t d = cur.dist;
-        if (dirt[current_tid][v] == -1) {
+        if (dirt[current_tid][v] == -1U) {
             dirt[current_tid][v] = 0;
             dmin[current_tid][v] = d;
         } else {
@@ -454,25 +387,19 @@ void PSL<weight_t>::propagate(const dgraph_v_of_v<weight_t> &g, int u) {
         }
     }
 
-    for (auto [v, dd] : g[u]) {
-        for (size_t i = endpos1[v]; i < L[v].size(); i++) {
-            int x = L[v][i].vertex;
-            if (rank[x] < rank[u]) {
+    for (auto [v, dd] : G[k][u]) {
+        for (size_t i = endpos1[k][v]; i < L[k][v].size(); i++) {
+            size_t x = L[k][v][i].vertex;
+            if (G[k].rnk(x) < G[k].rnk(u)) {  // higher rank means lower value of `rank`
                 continue;
             }
-            weight_t d_temp = dd + L[v][i].dist;
+            weight_t d_temp = dd + L[k][v][i].dist;
 
             // Line 12-16
             bool flag = false;
-            for (size_t j = endpos1[u]; j < L[u].size(); j++) {
-                int y = L[u][j].vertex;
-                if (!dirt[current_tid][y] && dmin[current_tid][y] + L[u][j].dist <= d_temp) {
-                    flag = true;
-                }
-            }
-            for (size_t j = endpos1[x]; j < L[x].size(); j++) {
-                int y = L[x][j].vertex;
-                if (!dirt[current_tid][y] && dmin[current_tid][y] + L[x][j].dist <= d_temp) {
+            for (size_t j = endpos1[k ^ 1][x]; j < L[k ^ 1][x].size(); j++) {
+                size_t y = L[k ^ 1][x][j].vertex;
+                if (!dirt[current_tid][y] && dmin[current_tid][y] + L[k ^ 1][x][j].dist <= d_temp) {
                     flag = true;
                 }
             }
@@ -481,13 +408,13 @@ void PSL<weight_t>::propagate(const dgraph_v_of_v<weight_t> &g, int u) {
             }
 
             // Line 17
-            L_temp[u].emplace_back(x, d_temp, v);
+            L_temp[k][u].emplace_back(x, d_temp, v);
         }
     }
 
-    for (const label<weight_t> &cur : L[u]) {
-        int v = cur.vertex;
-        dirt[current_tid][v] = -1;
+    for (const label<weight_t> &cur : L[k][u]) {
+        size_t v = cur.vertex;
+        dirt[current_tid][v] = -1U;
     }
 
     mtx.lock();
@@ -496,22 +423,22 @@ void PSL<weight_t>::propagate(const dgraph_v_of_v<weight_t> &g, int u) {
 }
 
 template <class weight_t>
-void PSL<weight_t>::append(int u) {
-    L[u].insert(L[u].end(), L_temp[u].begin(), L_temp[u].end());
-    L[u].shrink_to_fit();
+void PSL<weight_t>::append(int k, size_t u) {
+    L[k][u].insert(L[k][u].end(), L_temp[k][u].begin(), L_temp[k][u].end());
+    L[k][u].shrink_to_fit();
 }
 
 template <class weight_t>
-void PSL<weight_t>::shrink(int u) {
+void PSL<weight_t>::shrink(int k, size_t u) {
     mtx.lock();
     int current_tid = thread_id.front();
     thread_id.pop();
     mtx.unlock();
 
-    for (const label<weight_t> &cur : L[u]) {
-        int v = cur.vertex;
+    for (const label<weight_t> &cur : L[k][u]) {
+        size_t v = cur.vertex;
         weight_t d = cur.dist;
-        if (dirt[current_tid][v] == -1) {
+        if (dirt[current_tid][v] == -1U) {
             dmin[current_tid][v] = d;
             dirt[current_tid][v] = cur.prev;
         } else if (d < dmin[current_tid][v]) {
@@ -520,16 +447,155 @@ void PSL<weight_t>::shrink(int u) {
         }
     }
 
-    L[u].clear();
+    L[k][u].clear();
     for (size_t i = 0; i < dirt[current_tid].size(); i++) {
-        if (dirt[current_tid][i] == -1) {
+        if (dirt[current_tid][i] == -1U) {
             continue;
         }
-        L[u].emplace_back(i, dmin[current_tid][i], dirt[current_tid][i]);
-        dirt[current_tid][i] = -1;
+        L[k][u].emplace_back(i, dmin[current_tid][i], dirt[current_tid][i]);
+        dirt[current_tid][i] = -1U;
     }
 
     mtx.lock();
     thread_id.push(current_tid);
     mtx.unlock();
+}
+
+template <class weight_t>
+void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G,
+                                     int num_of_threads) {
+    // Line 1-2
+    for (int k = 0; k < 2; k++) {
+        L[k].resize(G[k].getV());
+        L_temp[k].resize(G[k].getV());
+        endpos1[k].resize(G[k].getV());
+        for (size_t i = 0; i < G[k].getV(); i++) {
+            L[k][i].emplace_back(i, 0, i);
+        }
+    }
+
+    ThreadPool pool(num_of_threads);
+    std::vector<std::future<int>> results;
+    // int num_of_threads_per_push = num_of_threads * 1000;
+    // ÿ��push��ȥ num_of_threads_per_push
+    // �̣߳����û���쳣������push��ȥnum_of_threads_per_push�̣߳����ȫ��һ��push��ȥ����ȫ���̶߳���������catch�쳣
+
+    // since R2 skip some vertices, some new labels can only be
+    // generated when d increases 2, not 1, thus terminate the
+    // loop only when if_continue_595==false twice
+    while (true) {
+        std::cout << "[Iter - Out]" << std::endl;
+        print_label_set(L[0]);
+        std::cout << "[Iter - In]" << std::endl;
+        print_label_set(L[1]);
+        std::cout << std::endl;
+
+        // Line 4-20
+        bool is_empty[2] = {true, true};
+
+        for (int k = 0; k < 2; k++) {
+            for (size_t u = 0; u < G[k].getV(); u++) {
+                // if (ideal_graph_595[u].size() == 0 ||
+                //     case_info.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
+                //     continue;  // do not search isolated vertices
+                // auto *xx = &case_info;
+
+                // new labels add into L_temp[u], but also read L in the process
+#ifndef DISABLE_MULTITHREAD
+                results.emplace_back(pool.enqueue([k, u, this, &G] {
+#endif
+                    this->propagate(G, k, u);
+#ifndef DISABLE_MULTITHREAD
+                    return 1;
+                }));
+#endif
+                // push_num++;
+                // if (push_num % num_of_threads_per_push == 0) {
+                //     for (auto &&result : results)
+                //         result.get();  // all threads finish here
+                //     results.clear();
+                // }
+            }
+
+#ifndef DISABLE_MULTITHREAD
+            for (auto &&result : results) {
+                result.get();
+            }
+            results.clear();
+#endif
+
+            for (size_t u = 0; u < G[k].getV(); u++) {
+                // if (ideal_graph_595[u].size() == 0 ||
+                //     case_info.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
+                //     continue;                            // do not search isolated vertices
+
+                // new labels in L_temp[u] add into L[u], to avoid locking L in propagate process
+#ifndef DISABLE_MULTITHREAD
+                results.emplace_back(pool.enqueue([k, u, this] {
+#endif
+                    this->append(k, u);
+#ifndef DISABLE_MULTITHREAD
+                    return 1;
+                }));
+#endif
+            }
+
+#ifndef DISABLE_MULTITHREAD
+            for (auto &&result : results) {
+                result.get();
+            }
+            results.clear();
+#endif
+
+            for (size_t u = 0; u < G[k].getV(); u++) {
+                if (!L_temp[k][u].empty()) {
+                    is_empty[k] = false;
+                }
+                endpos1[k][u] = L[k][u].size() - L_temp[k][u].size();
+                L_temp[k][u].clear();
+            }
+        }  // for loop to choose graph
+
+        if (is_empty[0] && is_empty[1]) {
+            break;
+        }
+    }  // while loop
+
+    // remove redundant labels in L
+    for (int k = 0; k < 2; k++) {
+        for (size_t u = 0; u < G[k].getV(); u++) {
+#ifndef DISABLE_MULTITHREAD
+            results.emplace_back(pool.enqueue([k, u, this] {
+#endif
+                this->shrink(k, u);
+#ifndef DISABLE_MULTITHREAD
+                return 1;
+            }));
+#endif
+        }
+    }
+    
+    std::cout << "[Shrinked - Out]" << std::endl;
+    print_label_set(L[0]);
+    std::cout << "[Shrinked - In]" << std::endl;
+    print_label_set(L[1]);
+    std::cout << std::endl;
+
+#ifndef DISABLE_MULTITHREAD
+    for (auto &&result : results) {
+        result.get();
+    }
+    results.clear();
+#endif
+}
+
+template <class weight_t>
+void PSL<weight_t>::print_label_set(const std::vector<std::vector<label<weight_t>>> &_L) {
+    for (size_t i = 0; i < _L.size(); i++) {
+        std::cout << "[" << i << "] ";
+        for (const label<weight_t> &cur : _L[i]) {
+            std::cout << cur << " ";
+        }
+        std::cout << "\n";
+    }
 }
