@@ -53,6 +53,11 @@ void dgraph_v_of_v<weight_type>::add_edge(int v1, int v2, weight_type weight) {
 
 	graph_hash_of_mixed_weighted_binary_operations_insert(OUTs[v1], v2, weight);
 	graph_hash_of_mixed_weighted_binary_operations_insert(INs[v2], v1, weight);
+}
+
+
+template <typename weight_type>
+void dgraph_v_of_v<weight_type>::remove_edge(int v1, int v2) {
 
     /*edge direction: v1 to v2*/
 	/*edge direction: v1 to v2*/
