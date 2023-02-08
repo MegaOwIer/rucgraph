@@ -1,4 +1,7 @@
 #pragma once
+#include<vector>
+#include<iostream>
+#include <graph_hash_of_mixed_weighted/graph_hash_of_mixed_weighted_binary_operations.h>
 
 /*
 a directed graph with edge weights, but not node weights
@@ -23,10 +26,6 @@ public:
 		OUTs.resize(n);
 	}
 
-    /**
-     * @brief Get number of edges.
-     */
-    size_t edge_number();
 
 	/*class member functions*/
 	inline void add_edge(int, int, weight_type); // this function can change edge weights
@@ -52,14 +51,20 @@ void dgraph_v_of_v<weight_type>::add_edge(int v1, int v2, weight_type weight) {
 	this function can change edge weights;
 	*/
 
+	graph_hash_of_mixed_weighted_binary_operations_insert(OUTs[v1], v2, weight);
+	graph_hash_of_mixed_weighted_binary_operations_insert(INs[v2], v1, weight);
+
+    /*edge direction: v1 to v2*/
+	/*edge direction: v1 to v2*/
+
 	graph_hash_of_mixed_weighted_binary_operations_erase(OUTs[v1], v2);
 	graph_hash_of_mixed_weighted_binary_operations_erase(INs[v2], v1);
 }
 
-template <typename weight_t>
-weight_t dgraph_v_of_v<weight_t>::edge_weight(int v1, int v2) {
+template <typename weight_type>
+weight_type dgraph_v_of_v<weight_type>::edge_weight(int v1, int v2) {
 
-    /*edge direction: v1 to v2*/
+	/*edge direction: v1 to v2*/
 
 	return graph_hash_of_mixed_weighted_binary_operations_search_weight(OUTs[v1], v2);
 }
