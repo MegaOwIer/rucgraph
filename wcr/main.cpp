@@ -13,6 +13,7 @@ void run_small_sample() {
 
     PSL::dgraph<int> g(6);
 
+    // Sample graph #1
     g.add_edge(0, 1, 1);
     g.add_edge(0, 4, 2);
     g.add_edge(0, 5, 4);
@@ -23,6 +24,13 @@ void run_small_sample() {
     g.add_edge(4, 3, 6);
     g.add_edge(4, 5, 1);
     g.add_edge(5, 3, 1);
+
+    // Sample graph #2
+    // g.add_edge(0, 2, 1);
+    // g.add_edge(1, 2, 1);
+    // g.add_edge(2, 3, 1);
+    // g.add_edge(3, 4, 1);
+    // g.add_edge(3, 5, 1);
 
     /* reduction method selection*/
     PSL::runtime_info cfg;

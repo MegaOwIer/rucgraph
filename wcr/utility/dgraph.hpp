@@ -60,16 +60,6 @@ public:
      * @brief Add an edge from v1 to v2 with given weight. No check to prevent duplicate edges.
      */
     void add_edge(size_t v1, size_t v2, weight_t weight);
-
-    /**
-     * @brief Sort nodes in out degree DESC.
-     */
-    void sort_nodes();
-
-    /**
-     * @brief Return node rank of node u.
-     */
-    size_t rnk(size_t u) const;
 };
 
 template <class weight_t>
@@ -100,24 +90,6 @@ size_t dgraph<weight_t>::edge_number() {
 template <class weight_t>
 void dgraph<weight_t>::add_edge(size_t v1, size_t v2, weight_t weight) {
     adj_lists[v1].emplace_back(v2, weight);
-}
-
-template <class weight_t>
-void dgraph<weight_t>::sort_nodes() {
-    sorted_vertex.resize(getV());
-    std::iota(sorted_vertex.begin(), sorted_vertex.end(), 0);
-    std::stable_sort(sorted_vertex.begin(), sorted_vertex.end(),
-                     [&](size_t u, size_t v) { return adj_lists[u].size() > adj_lists[v].size(); });
-
-    rank.resize(getV());
-    for (size_t i = 0; i < getV(); i++) {
-        rank[sorted_vertex[i]] = i;
-    }
-}
-
-template <class weight_t>
-size_t dgraph<weight_t>::rnk(size_t u) const {
-    return rank.at(u);
 }
 
 }  // namespace PSL

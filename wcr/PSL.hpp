@@ -34,8 +34,7 @@ class PSL {
     using label_set = std::vector<std::vector<label<weight_t>>>;
 
     // node ranks
-    std::vector<size_t> sorted_vertex;
-    std::vector<size_t> rank;
+    std::vector<size_t> sorted_vertex, rank;
 
     // results. 0 -> out, 1 -> in
     label_set L[2], L_temp[2];
@@ -95,8 +94,21 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &
 
     // Build graph and rev_graph
     std::array<dgraph<weight_t>, 2> G {dgraph<weight_t>(g), dgraph<weight_t>(g, true)};
-    G[0].sort_nodes();
-    G[1].sort_nodes();
+
+    // Sort nodes
+    sorted_vertex.resize(G[0].getV());
+    rank.resize(G[0].getV());
+
+    std::iota(sorted_vertex.begin(), sorted_vertex.end(), 0);
+    for (size_t i = 0; i < G[0].getV(); i++) {
+        rank[i] = G[0][i].size() + G[1][i].size();  // sum of in-deg and out-deg
+    }
+    std::stable_sort(sorted_vertex.begin(), sorted_vertex.end(),
+                     [&](size_t u, size_t v) { return rank[u] > rank[v]; });
+
+    for (size_t i = 0; i < G[0].getV(); i++) {
+        rank[sorted_vertex[i]] = i;
+    }
 
     end_time = std::chrono::high_resolution_clock::now();
     cfg.time_initialization =
@@ -367,7 +379,7 @@ void PSL<weight_t>::propagate(const std::array<dgraph<weight_t>, 2> &G, int k, s
     for (auto [v, dd] : G[k][u]) {
         for (size_t i = endpos1[k][v]; i < L[k][v].size(); i++) {
             size_t x = L[k][v][i].vertex;
-            if (G[k].rnk(x) < G[k].rnk(u)) {  // higher rank means lower value of `rank`
+            if (rank[x] < rank[u]) {  // higher rank means lower value of `rank`
                 continue;
             }
             weight_t d_temp = dd + L[k][v][i].dist;
