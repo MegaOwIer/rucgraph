@@ -11,18 +11,22 @@
 #include <iostream>
 #include <vector>
 
-struct PSL_runtime_info {
+namespace PSL {
+
+struct runtime_info {
     /* Running time */
     long long time_initialization = 0;
-    long long time_2019R1 = 0;
-    long long time_2019R2 = 0;
     long long time_generate_labels = 0;
     // long long time_canonical_repair1 = 0;
     // long long time_canonical_repair2 = 0;
 
-    /* Reduction info */
-    bool use_2019R1 = false;  // Equivalence between nodes
-    bool use_2019R2 = false;  // Local minimum set elimination
+    /* Reduction 1: Equivalence between Vertices */
+    bool use_equiv = false;
+    long long time_rdc_equiv = 0;
+
+    /* Reduction 2 : Local Minimum Set */
+    bool use_lms = false;  // Local minimum set elimination
+    long long time_rdc_lms = 0;
 
     /*running limits*/
     long long int max_labal_size = 1e12;  // 2-hop-label num
@@ -50,7 +54,8 @@ struct PSL_runtime_info {
     //     size = size + reduction_measures_2019R1.size() * 4;
     //     size = size + f_2019R1.size() * 4;
     //     for (auto it = L.begin(); it != L.end(); it++) {
-    //         size = size + (*it).size() * sizeof(two_hop_label_v1);  // 12 bit per two_hop_label_v1
+    //         size = size + (*it).size() * sizeof(two_hop_label_v1);  // 12 bit per
+    //         two_hop_label_v1
     //     }
     //     return size;
     // }
@@ -96,3 +101,5 @@ struct PSL_runtime_info {
     //     }
     // }
 };
+
+}  // namespace PSL

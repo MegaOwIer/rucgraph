@@ -11,6 +11,8 @@
 
 #include <iostream>
 
+namespace PSL {
+
 template <class weight_t>
 struct label {
     size_t vertex, prev;
@@ -25,3 +27,5 @@ template <class weight_t>
 std::ostream &operator<<(std::ostream &os, const label<weight_t> &cur) {
     return os << "(" << cur.vertex << ", " << cur.dist << ", " << cur.prev << ")";
 }
+
+}  // namespace PSL

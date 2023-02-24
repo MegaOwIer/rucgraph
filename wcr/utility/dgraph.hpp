@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 
+namespace PSL {
+
 /**
  * @brief Directed graph with edge weights for PSL. Nodes are labeled from 0.
  *
@@ -71,8 +73,7 @@ public:
 };
 
 template <class weight_t>
-dgraph<weight_t>::dgraph(const dgraph &g, bool reverse)
-    : dgraph(g.getV()) {
+dgraph<weight_t>::dgraph(const dgraph &g, bool reverse) : dgraph(g.getV()) {
 
     for (size_t u = 0; u < g.getV(); u++) {
         for (auto [v, w] : g[u]) {
@@ -118,3 +119,5 @@ template <class weight_t>
 size_t dgraph<weight_t>::rnk(size_t u) const {
     return rank.at(u);
 }
+
+}  // namespace PSL

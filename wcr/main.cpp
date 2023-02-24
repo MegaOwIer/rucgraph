@@ -11,7 +11,7 @@
 
 void run_small_sample() {
 
-    dgraph<int> g(6);
+    PSL::dgraph<int> g(6);
 
     g.add_edge(0, 1, 1);
     g.add_edge(0, 4, 2);
@@ -25,7 +25,7 @@ void run_small_sample() {
     g.add_edge(5, 3, 1);
 
     /* reduction method selection*/
-    PSL_runtime_info mm;
+    PSL::runtime_info cfg;
     // mm.use_2019R1 = 0;
     // mm.use_2019R2 = 0;
     // mm.use_enhanced2019R2 = 0;
@@ -35,10 +35,10 @@ void run_small_sample() {
     // mm.max_run_time_seconds = 1e9;
     // mm.use_canonical_repair = true;
 
-    PSL<int> solve(g, 1, mm);
+    PSL::PSL<int> solve(g, 6, cfg);
 
-    for(int i = 0; i < 6; i++) {
-        for(int j = 0; j < 6; j++) {
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++) {
             std::cout << solve.query_dist(i, j) << "\t";
         }
         std::cout << "\n";

@@ -1,6 +1,6 @@
 /**
  * @file PSL.hpp
- * @brief Implementation of PSL algorithm.
+ * @brief Implementation of PSL algorithm for directed graph.
  * @version 0.1
  * @ref <paper-bibinfo>
  *
@@ -26,6 +26,8 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+namespace PSL {
 
 template <class weight_t>
 class PSL {
@@ -63,9 +65,9 @@ public:
      * @tparam weight_t
      * @param g
      * @param num_of_threads
-     * @param case_info
+     * @param cfg
      */
-    PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_info &case_info);
+    PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &cfg);
 
     /**
      * @brief Query length of shortest path from u to v.
@@ -74,7 +76,7 @@ public:
 };
 
 template <class weight_t>
-PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_info &case_info) {
+PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &cfg) {
 
     decltype(std::chrono::high_resolution_clock::now()) begin_time, end_time;
 
@@ -82,54 +84,35 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
 
     begin_time = std::chrono::high_resolution_clock::now();
 
-    // std::vector<std::vector<pair<int, double>>>().swap(adjs);
-    // adjs.resize(max_N_ID);
-    // std::vector<pair<int, double>>().swap(min_adjs);
-    // min_adjs.resize(max_N_ID);
-    // std::vector<std::pair<int, int>> sorted_vertices;
-    // for (auto it = g.hash_of_std::vectors.begin(); it != g.hash_of_std::vectors.end(); it++) {
-    //     sorted_vertices.push_back({it->first, g.degree(it->first)});
-    //     adjs[it->first] = g.adj_v_and_ec(it->first);
-    //     min_adjs[it->first] = g.min_adj(it->first);
-    // }
-    // sort(sorted_vertices.begin(), sorted_vertices.end(), compare_pair_second_large_to_small);
+    // Prepare for thread pool
+    dmin.resize(num_of_threads);
+    dirt.resize(num_of_threads);
+    for (int i = 0; i < num_of_threads; i++) {
+        dmin[i].resize(g.getV());
+        dirt[i].assign(g.getV(), -1U);
+        thread_id.push(i);
+    }
 
-    /*graph_hash_of_mixed_weighted_to_graph_v_of_v_idealID*/
-    // unordered_map<int, int> vertexID_old_to_new;
-    // vertexID_new_to_old_595.resize(N);
-    // for (int i = 0; i < N; i++) {
-    //     vertexID_old_to_new[sorted_vertices[i].first] = i;
-    //     vertexID_new_to_old_595[i] = sorted_vertices[i].first;
-    // }
-    // std::vector<pair<int, int>>().swap(sorted_vertices);
-    // ideal_graph_595 = graph_hash_of_mixed_weighted_to_graph_v_of_v_idealID(g,
-    // vertexID_old_to_new);
-
-    // /*redcution: add and remove certain edges*/
-    // case_info.reduction_measures_2019R2.clear();  // for using this function multiple times
-    // case_info.reduction_measures_2019R2.resize(max_N_ID);
-    // /*clear case_info.f_2019R1*/
-    // case_info.reduction_measures_2019R1.clear();  // for using this function multiple times
-    // case_info.reduction_measures_2019R1.resize(max_N_ID);
-    // case_info.f_2019R1.resize(max_N_ID);
-    // std::iota(std::begin(case_info.f_2019R1), std::end(case_info.f_2019R1),
-    //           0);  // Fill with 0, 1, ...
+    // Build graph and rev_graph
+    std::array<dgraph<weight_t>, 2> G {dgraph<weight_t>(g), dgraph<weight_t>(g, true)};
+    G[0].sort_nodes();
+    G[1].sort_nodes();
 
     end_time = std::chrono::high_resolution_clock::now();
-    case_info.time_initialization =
+    cfg.time_initialization =
         std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
 
     /* ------- Reduction ------- */
 
-    /* redcution1: equivalence between vertices */
-    if (case_info.use_2019R1) {
+    /* Reduction 1: Equivalence between Vertices (Not Implemented) */
+    if (cfg.use_equiv) {
         // begin_time = std::chrono::high_resolution_clock::now();
 
         // ThreadPool pool(num_of_threads);
         // std::vector<std::future<int>> results;  // return typename: xxx
         // for (int i = 0; i < g.getV(); i++) {
-        //     std::vector<int> *xx = &(case_info.reduction_measures_2019R1);
-        //     std::vector<int> *yy = &(case_info.f_2019R1);
+        //     std::vector<int> *xx = &(cfg.reduction_measures_2019R1);
+        //     std::vector<int> *yy = &(cfg.f_2019R1);
         //     results.emplace_back(
         //         pool.enqueue([i, ideal_graph_size, xx,
         //                       yy] {  // pass const type value j to thread; [] can be empty
@@ -141,57 +124,63 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
         // for (auto &&result : results)
         //     result.get();  // all threads finish here
         // /* remove edges */
-        // case_info.reduce_V_num_2019R1 = 0;
+        // cfg.reduce_V_num_2019R1 = 0;
         // for (int i = 0; i < max_N_ID; i++) {
-        //     if (case_info.f_2019R1[i] != i) {
-        //         if (case_info.f_2019R1[case_info.f_2019R1[i]] != case_info.f_2019R1[i]) {
+        //     if (cfg.f_2019R1[i] != i) {
+        //         if (cfg.f_2019R1[cfg.f_2019R1[i]] != cfg.f_2019R1[i]) {
         //             cout << "f error due to the above parallelly updating f" << endl;
         //             // getchar();
         //         }
-        //         case_info.reduce_V_num_2019R1++;
+        //         cfg.reduce_V_num_2019R1++;
         //         graph_v_of_v_idealID_remove_all_adjacent_edges(ideal_graph_595,
         //                                                        vertexID_old_to_new[i]);
         //     }
         // }
 
         // end_time = std::chrono::high_resolution_clock::now();
-        // case_info.time_2019R1 =
+        // cfg.time_2019R1 =
         //     std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1e9;
     }
 
-    // begin = std::chrono::high_resolution_clock::now();
-    // if (case_info.use_2019R2) {  // no edge is removed here
-    //     case_info.MG_num = 0;
+    if (cfg.use_lms) {
+        begin_time = std::chrono::high_resolution_clock::now();
+
+        end_time = std::chrono::high_resolution_clock::now();
+        cfg.time_rdc_lms =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
+    }
+    // if (cfg.use_2019R2) {  // no edge is removed here
+    //     cfg.MG_num = 0;
     //     for (int x = 0; x < N; x++) {
     //         if (ideal_graph_595[x].size() > 0) {  // Prevent memory overflow
     //             if (x > ideal_graph_595[x][ideal_graph_595[x].size() - 1]
     //                         .first) {  // Here, only one comparison is needed. A little trick.
-    //                 case_info.MG_num++;
-    //                 case_info.reduction_measures_2019R2[vertexID_new_to_old_595[x]] = 2;
+    //                 cfg.MG_num++;
+    //                 cfg.reduction_measures_2019R2[vertexID_new_to_old_595[x]] = 2;
     //                 // cout << "reduce " << vertexID_new_to_old_595[x] << endl;
     //             }
     //         }
     //     }
-    // } else if (case_info.use_enhanced2019R2) {  // e.g., 2019R2enhance_10
-    //     case_info.MG_num = 0;
+    // } else if (cfg.use_enhanced2019R2) {  // e.g., 2019R2enhance_10
+    //     cfg.MG_num = 0;
     //     for (int x = 0; x < N; x++) {
     //         if (ideal_graph_595[x].size() > 0) {  // Prevent memory overflow
     //             if (x > ideal_graph_595[x][ideal_graph_595[x].size() - 1]
     //                         .first) {  // Here, only one comparison is needed. A little trick.
-    //                 case_info.MG_num++;
-    //                 case_info.reduction_measures_2019R2[vertexID_new_to_old_595[x]] = 2;
+    //                 cfg.MG_num++;
+    //                 cfg.reduction_measures_2019R2[vertexID_new_to_old_595[x]] = 2;
     //                 // cout << "reduce " << vertexID_new_to_old_595[x] << endl;
     //             }
     //         }
     //     }
-    //     int bound = case_info.max_degree_MG_enhanced2019R2;
+    //     int bound = cfg.max_degree_MG_enhanced2019R2;
     //     for (int x = N - 1; x >= 0; x--) {  // from low ranking to high ranking
-    //         if (case_info.reduction_measures_2019R2[vertexID_new_to_old_595[x]] == 0 &&
+    //         if (cfg.reduction_measures_2019R2[vertexID_new_to_old_595[x]] == 0 &&
     //             ideal_graph_595[x].size() <= bound) {  // bound is the max degree for reduction
     //             bool no_adj_MG_vertices = true;
     //             for (auto it = ideal_graph_595[x].begin(); it != ideal_graph_595[x].end(); it++)
     //             {
-    //                 if (case_info.reduction_measures_2019R2[vertexID_new_to_old_595[it->first]]
+    //                 if (cfg.reduction_measures_2019R2[vertexID_new_to_old_595[it->first]]
     //                 ==
     //                     2) {
     //                     no_adj_MG_vertices = false;
@@ -199,23 +188,23 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     //                 }
     //             }
     //             if (no_adj_MG_vertices) {
-    //                 case_info.MG_num++;
-    //                 case_info.reduction_measures_2019R2[vertexID_new_to_old_595[x]] =
+    //                 cfg.MG_num++;
+    //                 cfg.reduction_measures_2019R2[vertexID_new_to_old_595[x]] =
     //                     2;  // new reduction
     //                         // cout << "new reduce " << vertexID_new_to_old_595[x] << endl;
     //             }
     //         }
     //     }
-    // } else if (case_info.use_non_adj_reduc_degree) {  // e.g., 2019R2enhance_10
-    //     case_info.MG_num = 0;
-    //     int bound = case_info.max_degree_MG_enhanced2019R2;
+    // } else if (cfg.use_non_adj_reduc_degree) {  // e.g., 2019R2enhance_10
+    //     cfg.MG_num = 0;
+    //     int bound = cfg.max_degree_MG_enhanced2019R2;
     //     for (int x = N - 1; x >= 0; x--) {  // from low ranking to high ranking
-    //         if (case_info.reduction_measures_2019R2[vertexID_new_to_old_595[x]] == 0 &&
+    //         if (cfg.reduction_measures_2019R2[vertexID_new_to_old_595[x]] == 0 &&
     //             ideal_graph_595[x].size() <= bound) {  // bound is the max degree for reduction
     //             bool no_adj_MG_vertices = true;
     //             for (auto it = ideal_graph_595[x].begin(); it != ideal_graph_595[x].end(); it++)
     //             {
-    //                 if (case_info.reduction_measures_2019R2[vertexID_new_to_old_595[it->first]]
+    //                 if (cfg.reduction_measures_2019R2[vertexID_new_to_old_595[it->first]]
     //                 ==
     //                     2) {
     //                     no_adj_MG_vertices = false;
@@ -223,8 +212,8 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     //                 }
     //             }
     //             if (no_adj_MG_vertices) {
-    //                 case_info.MG_num++;
-    //                 case_info.reduction_measures_2019R2[vertexID_new_to_old_595[x]] =
+    //                 cfg.MG_num++;
+    //                 cfg.reduction_measures_2019R2[vertexID_new_to_old_595[x]] =
     //                     2;  // new reduction
     //                         // cout << "new reduce " << vertexID_new_to_old_595[x] << endl;
     //             }
@@ -232,26 +221,14 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     //     }
     // }
     // end = std::chrono::high_resolution_clock::now();
-    // case_info.time_2019R2_or_enhanced_pre =
+    // cfg.time_2019R2_or_enhanced_pre =
     //     std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count() /
     //     1e9;
 
     /* ------- Generate Labels ------- */
     begin_time = std::chrono::high_resolution_clock::now();
 
-    // prepare for thread pool
-    dmin.resize(num_of_threads);
-    dirt.resize(num_of_threads);
-    for (int i = 0; i < num_of_threads; i++) {
-        dmin[i].resize(g.getV());
-        dirt[i].assign(g.getV(), -1U);
-        thread_id.push(i);
-    }
-
     // build labels
-    std::array<dgraph<weight_t>, 2> G {dgraph<weight_t>(g), dgraph<weight_t>(g, true)};
-    G[0].sort_nodes();
-    G[1].sort_nodes();
     build_PSL_labels(G, num_of_threads);
 
     // free heaps
@@ -263,7 +240,7 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     dmin.clear();
 
     end_time = std::chrono::high_resolution_clock::now();
-    case_info.time_generate_labels =
+    cfg.time_generate_labels =
         std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
     //---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -281,17 +258,17 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     // }
 
     /*canonical_repair based on the sorted new ID order, not the original ID order!*/
-    // if (case_info.use_canonical_repair) {
+    // if (cfg.use_canonical_repair) {
     //     begin = std::chrono::high_resolution_clock::now();
     //     reduction_measures_2019R1_new_ID.resize(max_N_ID, 0);
     //     reduction_measures_2019R2_new_ID.resize(max_N_ID, 0);
     //     f_2019R1_new_ID.resize(max_N_ID, 0);
     //     for (int i = 0; i < N; i++) {
     //         reduction_measures_2019R1_new_ID[vertexID_old_to_new[i]] =
-    //             case_info.reduction_measures_2019R1[i];
+    //             cfg.reduction_measures_2019R1[i];
     //         reduction_measures_2019R2_new_ID[vertexID_old_to_new[i]] =
-    //             case_info.reduction_measures_2019R2[i];
-    //         f_2019R1_new_ID[vertexID_old_to_new[i]] = vertexID_old_to_new[case_info.f_2019R1[i]];
+    //             cfg.reduction_measures_2019R2[i];
+    //         f_2019R1_new_ID[vertexID_old_to_new[i]] = vertexID_old_to_new[cfg.f_2019R1[i]];
     //         sort(L_temp_595[i].begin(), L_temp_595[i].end(),
     //              compare_two_hop_label_small_to_large);  // sort is necessary
     //     }
@@ -307,17 +284,17 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     //         min_adjs_new_IDs[it->first] = new_ID_g.min_adj(it->first);
     //     }
     //     end = std::chrono::high_resolution_clock::now();
-    //     case_info.time_canonical_repair1 =
+    //     cfg.time_canonical_repair1 =
     //         std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1e9;  //
     //         s
 
     //     begin = std::chrono::high_resolution_clock::now();
-    //     canonical_repair_multi_threads(new_ID_g, case_info.label_size_before_canonical_repair,
-    //                                    case_info.label_size_after_canonical_repair,
-    //                                    case_info.canonical_repair_remove_label_ratio,
+    //     canonical_repair_multi_threads(new_ID_g, cfg.label_size_before_canonical_repair,
+    //                                    cfg.label_size_after_canonical_repair,
+    //                                    cfg.canonical_repair_remove_label_ratio,
     //                                    num_of_threads);
     //     end = std::chrono::high_resolution_clock::now();
-    //     case_info.time_canonical_repair2 =
+    //     cfg.time_canonical_repair2 =
     //         std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1e9;  //
     //         s
     // }
@@ -339,11 +316,11 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, PSL_runtime_in
     // begin = std::chrono::high_resolution_clock::now();
 
     // /*return unordered_map_L for old_IDs*/
-    // case_info.L = graph_hash_of_mixed_weighted_PSL_v1_transform_labels_to_old_vertex_IDs(
+    // cfg.L = graph_hash_of_mixed_weighted_PSL_v1_transform_labels_to_old_vertex_IDs(
     //     N, max_N_ID, num_of_threads);
 
     // end = std::chrono::high_resolution_clock::now();
-    // case_info.time_update_old_IDs_in_labels =
+    // cfg.time_update_old_IDs_in_labels =
     //     std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count() /
     //     1e9;
     //---------------------------------------------------------------------------------------------------------------------------------------
@@ -462,8 +439,7 @@ void PSL<weight_t>::shrink(int k, size_t u) {
 }
 
 template <class weight_t>
-void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G,
-                                     int num_of_threads) {
+void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, int num_of_threads) {
     // Line 1-2
     for (int k = 0; k < 2; k++) {
         L[k].resize(G[k].getV());
@@ -477,18 +453,18 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G,
     ThreadPool pool(num_of_threads);
     std::vector<std::future<int>> results;
     // int num_of_threads_per_push = num_of_threads * 1000;
-    // ÿ��push��ȥ num_of_threads_per_push
-    // �̣߳����û���쳣������push��ȥnum_of_threads_per_push�̣߳����ȫ��һ��push��ȥ����ȫ���̶߳���������catch�쳣
+    // 每次push进去 num_of_threads_per_push
+    // 线程，如果没有异常，继续push进去num_of_threads_per_push线程；如果全都一起push进去必须全部线程都结束才能catch异常
 
     // since R2 skip some vertices, some new labels can only be
     // generated when d increases 2, not 1, thus terminate the
     // loop only when if_continue_595==false twice
     while (true) {
-        std::cout << "[Iter - Out]" << std::endl;
-        print_label_set(L[0]);
-        std::cout << "[Iter - In]" << std::endl;
-        print_label_set(L[1]);
-        std::cout << std::endl;
+        // std::cout << "[Iter - Out]" << std::endl;
+        // print_label_set(L[0]);
+        // std::cout << "[Iter - In]" << std::endl;
+        // print_label_set(L[1]);
+        // std::cout << std::endl;
 
         // Line 4-20
         bool is_empty[2] = {true, true};
@@ -496,9 +472,9 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G,
         for (int k = 0; k < 2; k++) {
             for (size_t u = 0; u < G[k].getV(); u++) {
                 // if (ideal_graph_595[u].size() == 0 ||
-                //     case_info.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
+                //     cfg.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
                 //     continue;  // do not search isolated vertices
-                // auto *xx = &case_info;
+                // auto *xx = &cfg;
 
                 // new labels add into L_temp[u], but also read L in the process
 #ifndef DISABLE_MULTITHREAD
@@ -526,7 +502,7 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G,
 
             for (size_t u = 0; u < G[k].getV(); u++) {
                 // if (ideal_graph_595[u].size() == 0 ||
-                //     case_info.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
+                //     cfg.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
                 //     continue;                            // do not search isolated vertices
 
                 // new labels in L_temp[u] add into L[u], to avoid locking L in propagate process
@@ -574,12 +550,12 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G,
 #endif
         }
     }
-    
-    std::cout << "[Shrinked - Out]" << std::endl;
-    print_label_set(L[0]);
-    std::cout << "[Shrinked - In]" << std::endl;
-    print_label_set(L[1]);
-    std::cout << std::endl;
+
+    // std::cout << "[Shrinked - Out]" << std::endl;
+    // print_label_set(L[0]);
+    // std::cout << "[Shrinked - In]" << std::endl;
+    // print_label_set(L[1]);
+    // std::cout << std::endl;
 
 #ifndef DISABLE_MULTITHREAD
     for (auto &&result : results) {
@@ -599,3 +575,5 @@ void PSL<weight_t>::print_label_set(const std::vector<std::vector<label<weight_t
         std::cout << "\n";
     }
 }
+
+}  // namespace PSL
