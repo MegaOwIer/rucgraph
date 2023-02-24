@@ -547,11 +547,11 @@ void PSL<weight_t>::build_PSL_labels(int num_of_threads) {
     bool empty_2 = false;
 
     while (true) {
-        std::cout << "[Iter - Out]" << std::endl;
-        print_label_set(L[0]);
-        std::cout << "[Iter - In]" << std::endl;
-        print_label_set(L[1]);
-        std::cout << std::endl;
+        // std::cout << "[Iter - Out]" << std::endl;
+        // print_label_set(L[0]);
+        // std::cout << "[Iter - In]" << std::endl;
+        // print_label_set(L[1]);
+        // std::cout << std::endl;
 
         // Line 4-20
         bool is_empty[2] = {true, true};
@@ -641,11 +641,11 @@ void PSL<weight_t>::build_PSL_labels(int num_of_threads) {
         }
     }
 
-    std::cout << "[Shrinked - Out]" << std::endl;
-    print_label_set(L[0]);
-    std::cout << "[Shrinked - In]" << std::endl;
-    print_label_set(L[1]);
-    std::cout << std::endl;
+    // std::cout << "[Shrinked - Out]" << std::endl;
+    // print_label_set(L[0]);
+    // std::cout << "[Shrinked - In]" << std::endl;
+    // print_label_set(L[1]);
+    // std::cout << std::endl;
 
 #ifndef DISABLE_MULTITHREAD
     for (auto &&result : results) {

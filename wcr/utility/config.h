@@ -28,12 +28,11 @@ struct runtime_info {
     bool use_lms = false;  // Local minimum set elimination
     long long time_rdc_lms = 0;
 
-    /*running limits*/
-    long long int max_labal_size = 1e12;  // 2-hop-label num
-    double max_run_time_seconds = 1e12;   // s
+    // /*running limits*/
+    // long long int max_labal_size = 1e12;  // 2-hop-label num
+    // double max_run_time_seconds = 1e12;   // s
 
     /*labels*/
-    // std::vector<int> reduction_measures_2019R2;  // for 2019 R2
     // std::vector<int>
     //     reduction_measures_2019R1;  // for 2019 R1;  11 means equivalent_1 relation (no edge
     //                                 // between), 12 means equivalent_2 relation (edge between)
