@@ -27,6 +27,8 @@ struct runtime_info {
     /* Reduction 2 : Local Minimum Set */
     bool use_lms = false;  // Local minimum set elimination
     long long time_rdc_lms = 0;
+    size_t MG_size;
+    std::vector<size_t> is_lms;
 
     /*running limits*/
     long long int max_labal_size = 1e12;  // 2-hop-label num

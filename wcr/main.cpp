@@ -26,14 +26,7 @@ void run_small_sample() {
 
     /* reduction method selection*/
     PSL::runtime_info cfg;
-    // mm.use_2019R1 = 0;
-    // mm.use_2019R2 = 0;
-    // mm.use_enhanced2019R2 = 0;
-    // mm.use_non_adj_reduc_degree = 0;
-    // mm.max_degree_MG_enhanced2019R2 = 100;
-    // mm.max_labal_size = 6e9;
-    // mm.max_run_time_seconds = 1e9;
-    // mm.use_canonical_repair = true;
+    cfg.use_lms = false;
 
     PSL::PSL<int> solve(g, 6, cfg);
 

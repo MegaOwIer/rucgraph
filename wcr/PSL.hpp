@@ -33,13 +33,10 @@ template <class weight_t>
 class PSL {
     using label_set = std::vector<std::vector<label<weight_t>>>;
 
-    // node ranks
-    std::vector<size_t> sorted_vertex;
-    std::vector<size_t> rank;
-
     // results. 0 -> out, 1 -> in
     label_set L[2], L_temp[2];
-    std::vector<size_t> endpos1[2];
+    std::vector<size_t> endpos1[2];  // begin of L_{d-1}
+    std::vector<size_t> endpos2[2];  // begin of L_{d-2}
 
     // for multi-thread
     std::queue<int> thread_id;
@@ -47,16 +44,17 @@ class PSL {
     std::vector<std::vector<size_t>> dirt;
     std::vector<std::vector<weight_t>> dmin;
 
-    void propagate(const std::array<dgraph<weight_t>, 2> &G, int k, size_t u);
+    void propagate(const std::array<dgraph<weight_t>, 2> &G, int k, size_t u, runtime_info &cfg);
 
     void append(int k, size_t u);
 
     void shrink(int k, size_t u);
 
-    void build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, int num_of_threads);
+    void build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, int num_of_threads,
+                          runtime_info &cfg);
 
     // for debug
-    void print_label_set(const std::vector<std::vector<label<weight_t>>> &_L);
+    void print_label_set(const label_set &_L);
 
 public:
     /**
@@ -95,6 +93,8 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &
 
     // Build graph and rev_graph
     std::array<dgraph<weight_t>, 2> G {dgraph<weight_t>(g), dgraph<weight_t>(g, true)};
+
+    // sorting nodes
     G[0].sort_nodes();
     G[1].sort_nodes();
 
@@ -142,8 +142,29 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &
         //     std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() / 1e9;
     }
 
+    /* Reduction 2 : Local Minimum Set */
     if (cfg.use_lms) {
         begin_time = std::chrono::high_resolution_clock::now();
+
+        cfg.is_lms.assign(G[0].getV(), true);
+        for (int i = 0; i < 2; i++) {
+            for (size_t u = 0; u < G[i].getV(); u++) {
+                for (auto &[v, _] : G[i][u]) {
+                    if (G[i].rnk(u) < G[i].rnk(v)) {
+                        cfg.is_lms[u] = false;
+                    }
+                }
+            }
+        }
+        cfg.MG_size = std::count(cfg.is_lms.begin(), cfg.is_lms.end(), true);
+
+        // std::cout << "[Local Minimum]" << "\n";
+        // for(int u = 0; u < G[0].getV(); u++) {
+        //     if(cfg.is_lms[u]) {
+        //         std::cout << u << ' ';
+        //     }
+        // }
+        // std::cout << std::endl;
 
         end_time = std::chrono::high_resolution_clock::now();
         cfg.time_rdc_lms =
@@ -220,16 +241,12 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &
     //         }
     //     }
     // }
-    // end = std::chrono::high_resolution_clock::now();
-    // cfg.time_2019R2_or_enhanced_pre =
-    //     std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count() /
-    //     1e9;
 
     /* ------- Generate Labels ------- */
     begin_time = std::chrono::high_resolution_clock::now();
 
     // build labels
-    build_PSL_labels(G, num_of_threads);
+    build_PSL_labels(G, num_of_threads, cfg);
 
     // free heaps
     L_temp[0].clear();
@@ -242,7 +259,6 @@ PSL<weight_t>::PSL(const dgraph<weight_t> &g, int num_of_threads, runtime_info &
     end_time = std::chrono::high_resolution_clock::now();
     cfg.time_generate_labels =
         std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - begin_time).count();
-    //---------------------------------------------------------------------------------------------------------------------------------------
 
     //----------------------------------------------- step 4: canonical_repair
     //---------------------------------------------------------------
@@ -346,7 +362,8 @@ weight_t PSL<weight_t>::query_dist(size_t u, size_t v) {
 }
 
 template <class weight_t>
-void PSL<weight_t>::propagate(const std::array<dgraph<weight_t>, 2> &G, int k, size_t u) {
+void PSL<weight_t>::propagate(const std::array<dgraph<weight_t>, 2> &G, int k, size_t u,
+                              runtime_info &cfg) {
     mtx.lock();
     int current_tid = thread_id.front();
     thread_id.pop();
@@ -364,28 +381,46 @@ void PSL<weight_t>::propagate(const std::array<dgraph<weight_t>, 2> &G, int k, s
         }
     }
 
-    for (auto [v, dd] : G[k][u]) {
-        for (size_t i = endpos1[k][v]; i < L[k][v].size(); i++) {
-            size_t x = L[k][v][i].vertex;
-            if (G[k].rnk(x) < G[k].rnk(u)) {  // higher rank means lower value of `rank`
-                continue;
+    std::function<bool(size_t, weight_t)> is_redundant = [&](size_t x, weight_t d_temp) {
+        for (size_t j = endpos1[k ^ 1][x]; j < L[k ^ 1][x].size(); j++) {
+            size_t y = L[k ^ 1][x][j].vertex;
+            if (!dirt[current_tid][y] && dmin[current_tid][y] + L[k ^ 1][x][j].dist <= d_temp) {
+                return true;
             }
-            weight_t d_temp = dd + L[k][v][i].dist;
+        }
+        return false;
+    };
 
-            // Line 12-16
-            bool flag = false;
-            for (size_t j = endpos1[k ^ 1][x]; j < L[k ^ 1][x].size(); j++) {
-                size_t y = L[k ^ 1][x][j].vertex;
-                if (!dirt[current_tid][y] && dmin[current_tid][y] + L[k ^ 1][x][j].dist <= d_temp) {
-                    flag = true;
+    for (auto [v, dd] : G[k][u]) {
+        if (cfg.use_lms && cfg.is_lms[v]) {
+            // Redction 2: if v in M(G), enumerate neighbor of neighbor
+            for (auto [z, dd2] : G[k][v]) {
+                for (size_t i = endpos2[k][z]; i < endpos1[k][z]; i++) {
+                    size_t x = L[k][z][i].vertex;  // x is a hub in L_{d-2}(z)
+                    if (G[k].rnk(x) < G[k].rnk(z)) {
+                        continue;
+                    }
+
+                    weight_t d_temp = dd + dd2 + L[k][z][i].dist;  // u -> v -> z --> x
+                    if (!is_redundant(x, d_temp)) {
+                        L_temp[k][u].emplace_back(x, d_temp, v);
+                    }
                 }
             }
-            if (flag) {
-                continue;
-            }
+        } else {
+            for (size_t i = endpos1[k][v]; i < L[k][v].size(); i++) {
+                size_t x = L[k][v][i].vertex;     // x is a hub in L_{d-1}(v)
+                if (G[k].rnk(x) < G[k].rnk(u)) {  // higher rank means lower value of `rank`
+                    continue;
+                }
 
-            // Line 17
-            L_temp[k][u].emplace_back(x, d_temp, v);
+                weight_t d_temp = dd + L[k][v][i].dist;  // u -> v --> x
+
+                // Line 12-17
+                if (!is_redundant(x, d_temp)) {
+                    L_temp[k][u].emplace_back(x, d_temp, v);
+                }
+            }
         }
     }
 
@@ -439,7 +474,8 @@ void PSL<weight_t>::shrink(int k, size_t u) {
 }
 
 template <class weight_t>
-void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, int num_of_threads) {
+void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, int num_of_threads,
+                                     runtime_info &cfg) {
     // Line 1-2
     for (int k = 0; k < 2; k++) {
         L[k].resize(G[k].getV());
@@ -447,6 +483,22 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, i
         endpos1[k].resize(G[k].getV());
         for (size_t i = 0; i < G[k].getV(); i++) {
             L[k][i].emplace_back(i, 0, i);
+        }
+    }
+
+    // when reduction 2 is enabled, generate labels for d = 1 manually.
+    if (cfg.use_lms) {
+        for (int k = 0; k < 2; k++) {
+            endpos2[k].resize(G[k].getV());
+
+            for (size_t u = 0; u < G[k].getV(); u++) {
+                endpos1[k][u] = L[k][u].size();
+                for (auto &[v, w] : G[k][u]) {
+                    if (G[k].rnk(u) > G[k].rnk(v)) {
+                        L[k][u].emplace_back(v, w, v);
+                    }
+                }
+            }
         }
     }
 
@@ -471,16 +523,16 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, i
 
         for (int k = 0; k < 2; k++) {
             for (size_t u = 0; u < G[k].getV(); u++) {
-                // if (ideal_graph_595[u].size() == 0 ||
-                //     cfg.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
-                //     continue;  // do not search isolated vertices
+                if (cfg.use_lms && cfg.is_lms[u]) {
+                    continue;
+                }
                 // auto *xx = &cfg;
 
                 // new labels add into L_temp[u], but also read L in the process
 #ifndef DISABLE_MULTITHREAD
-                results.emplace_back(pool.enqueue([k, u, this, &G] {
+                results.emplace_back(pool.enqueue([k, u, this, &G, &cfg] {
 #endif
-                    this->propagate(G, k, u);
+                    this->propagate(G, k, u, cfg);
 #ifndef DISABLE_MULTITHREAD
                     return 1;
                 }));
@@ -501,9 +553,9 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, i
 #endif
 
             for (size_t u = 0; u < G[k].getV(); u++) {
-                // if (ideal_graph_595[u].size() == 0 ||
-                //     cfg.reduction_measures_2019R2[vertexID_new_to_old_595[u]] == 2)
-                //     continue;                            // do not search isolated vertices
+                if (cfg.use_lms && cfg.is_lms[u]) {
+                    continue;
+                }
 
                 // new labels in L_temp[u] add into L[u], to avoid locking L in propagate process
 #ifndef DISABLE_MULTITHREAD
@@ -523,6 +575,9 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, i
             results.clear();
 #endif
 
+            if (cfg.use_lms) {
+                std::copy(endpos1[k].begin(), endpos1[k].end(), endpos2[k].begin());
+            }
             for (size_t u = 0; u < G[k].getV(); u++) {
                 if (!L_temp[k][u].empty()) {
                     is_empty[k] = false;
@@ -566,7 +621,7 @@ void PSL<weight_t>::build_PSL_labels(const std::array<dgraph<weight_t>, 2> &G, i
 }
 
 template <class weight_t>
-void PSL<weight_t>::print_label_set(const std::vector<std::vector<label<weight_t>>> &_L) {
+void PSL<weight_t>::print_label_set(const label_set &_L) {
     for (size_t i = 0; i < _L.size(); i++) {
         std::cout << "[" << i << "] ";
         for (const label<weight_t> &cur : _L[i]) {
