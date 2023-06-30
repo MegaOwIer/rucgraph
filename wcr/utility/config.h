@@ -15,10 +15,15 @@ namespace PSL {
 
 struct runtime_info {
     /* Running time */
+    long long time_total = 0;
     long long time_initialization = 0;
     long long time_generate_labels = 0;
     // long long time_canonical_repair1 = 0;
     // long long time_canonical_repair2 = 0;
+
+    /* Memory Use */
+    size_t label_size_before = 0;
+    size_t label_size_after = 0;
 
     /* Reduction 1: Equivalence between Vertices */
     bool use_equiv = false;
@@ -31,13 +36,6 @@ struct runtime_info {
     // /*running limits*/
     // long long int max_labal_size = 1e12;  // 2-hop-label num
     // double max_run_time_seconds = 1e12;   // s
-
-    /*labels*/
-    // std::vector<int>
-    //     reduction_measures_2019R1;  // for 2019 R1;  11 means equivalent_1 relation (no edge
-    //                                 // between), 12 means equivalent_2 relation (edge between)
-    // std::vector<int> f_2019R1;      // for 2019 R1
-    // std::vector<std::vector<two_hop_label_v1>> L;
 
     // /*canonical_repair info*/
     // bool use_canonical_repair = false;
@@ -59,46 +57,16 @@ struct runtime_info {
     //     return size;
     // }
 
-    // /*clear labels*/
-    // void clear_labels() {
-    //     std::vector<int>().swap(reduction_measures_2019R2);
-    //     std::vector<int>().swap(reduction_measures_2019R1);
-    //     std::vector<int>().swap(f_2019R1);
-    //     std::vector<std::vector<two_hop_label_v1>>().swap(L);
-    // }
-
-    // /*printing*/
-    // void print_L() {
-    //     cout << "print_L:" << endl;
-    //     for (int i = 0; i < L.size(); i++) {
-    //         cout << "L[" << i << "]=";
-    //         for (int j = 0; j < L[i].size(); j++) {
-    //             cout << "{" << L[i][j].vertex << "," << L[i][j].distance << ","
-    //                  << L[i][j].parent_vertex << "}";
-    //         }
-    //         cout << endl;
-    //     }
-    // }
-    // void print_reduction_measures_2019R1() {
-    //     cout << "print_reduction_measures_2019R1:" << endl;
-    //     for (int i = 0; i < reduction_measures_2019R1.size(); i++) {
-    //         cout << "reduction_measures_2019R1[" << i << "]=" << reduction_measures_2019R1[i]
-    //              << endl;
-    //     }
-    // }
-    // void print_reduction_measures_2019R2() {
-    //     cout << "print_reduction_measures_2019R2:" << endl;
-    //     for (int i = 0; i < reduction_measures_2019R2.size(); i++) {
-    //         cout << "reduction_measures_2019R2[" << i << "]=" << reduction_measures_2019R2[i]
-    //              << endl;
-    //     }
-    // }
-    // void print_f_2019R1() {
-    //     cout << "print_f_2019R1:" << endl;
-    //     for (int i = 0; i < f_2019R1.size(); i++) {
-    //         cout << "f_2019R1[" << i << "]=" << f_2019R1[i] << endl;
-    //     }
-    // }
+    void display(std::ostream &os = std::cout);
 };
+
+void runtime_info::display(std::ostream &os) {
+    os << "time: " << time_total << "(" << time_initialization << " + " << time_generate_labels
+       << ")" << std::endl;
+    if (use_lms) {
+        os << "time_lms: " << time_rdc_lms << std::endl;
+    }
+    os << "size: " << label_size_before << " -> " << label_size_after << std::endl;
+}
 
 }  // namespace PSL

@@ -89,6 +89,9 @@ size_t dgraph<weight_t>::edge_number() {
 
 template <class weight_t>
 void dgraph<weight_t>::add_edge(size_t v1, size_t v2, weight_t weight) {
+    if (v1 == v2) {
+        return;
+    }
     adj_lists[v1].emplace_back(v2, weight);
 }
 
